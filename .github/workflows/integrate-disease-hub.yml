@@ -1,0 +1,101 @@
+name: Integrate Disease Hub and Improve Clinical Sidebar
+
+on:
+  push:
+    paths:
+      - 'disease-content-v1.js'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Integrate disease hub and sidebar improvements
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          if 'MEDCALC_DISEASE_HUB_V1' in s:
+              print('Disease hub already integrated')
+              raise SystemExit(0)
+          block=r'''
+          <!-- MEDCALC_DISEASE_HUB_V1 -->
+          <script src="disease-content-v1.js"></script>
+          <style id="MEDCALC_DISEASE_HUB_STYLE">
+          #medcalcClinicalSidebar .mcClinicalGroup{margin-top:6px;border-top:1px solid rgba(127,127,127,.14);padding-top:6px}
+          #medcalcClinicalSidebar .mcClinicalGroupHead{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:transparent;padding:7px 9px;font:inherit;font-weight:800;cursor:pointer;text-align:left}
+          #medcalcClinicalSidebar .mcClinicalGroupHead .chev{transition:transform .18s ease}
+          #medcalcClinicalSidebar .mcClinicalGroupHead[aria-expanded="false"] .chev{transform:rotate(-90deg)}
+          #medcalcClinicalSidebar .mcClinicalGroupBody{padding:0 4px 3px}
+          #medcalcClinicalSidebar .mcClinicalGroupBody.is-collapsed{display:none}
+          .mcDiseaseGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+          .mcDiseaseCard{border:1px solid rgba(127,127,127,.2);border-radius:15px;padding:15px;background:var(--card,#fff);cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+          .mcDiseaseCard:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+          .mcDiseaseCard h3{margin:0 0 6px;font-size:17px}.mcDiseaseMeta{font-size:12px;opacity:.7;margin-bottom:8px}.mcDiseaseSummary{line-height:1.45;font-size:14px}
+          .mcDiseaseSection{border:1px solid rgba(127,127,127,.18);border-radius:13px;padding:13px;margin:10px 0}.mcDiseaseSection h3{margin:0 0 7px;font-size:16px}.mcDiseaseSection ul{margin:6px 0 0 20px}.mcDiseaseRefs{font-size:12px;opacity:.78}
+          .mcDrugAccordion{border:1px solid rgba(127,127,127,.18);border-radius:13px;margin:10px 0;overflow:hidden}.mcDrugHead{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:transparent;padding:13px 15px;font:inherit;font-weight:800;text-align:left;cursor:pointer}.mcDrugHead .chev{transition:transform .18s}.mcDrugHead[aria-expanded="false"] .chev{transform:rotate(-90deg)}.mcDrugBody{padding:0 15px 13px}.mcDrugBody.is-collapsed{display:none}.mcDrugBody p{line-height:1.5}
+          </style>
+          <script id="MEDCALC_DISEASE_HUB_JS">
+          (function(){
+            function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+            function getDiseases(){return Array.isArray(window.MEDCALC_DISEASES)?window.MEDCALC_DISEASES:[];}
+            function diseaseList(root){
+              var q=(root.querySelector('.mcClinicalSearch')||{}).value||''; q=q.toLowerCase().trim();
+              var ds=getDiseases().filter(function(d){return !q||JSON.stringify(d).toLowerCase().indexOf(q)>=0;});
+              var html='<h2>Diseases & Treatment</h2><p>Structured, evidence-based disease reference for learning and clinical revision. Always verify current local protocols before patient care.</p><input class="mcClinicalSearch" placeholder="Search diseases..." value="'+esc(q)+'"><div class="mcDiseaseGrid">';
+              ds.forEach(function(d){html+='<div class="mcDiseaseCard" tabindex="0" data-disease="'+esc(d.id)+'"><h3>'+esc(d.name)+'</h3><div class="mcDiseaseMeta">'+esc(d.system)+'</div><div class="mcDiseaseSummary">'+esc(d.summary)+'</div></div>';});
+              html+='</div>'; if(!ds.length)html+='<p>No matching disease found.</p>'; root.innerHTML=html;
+              var input=root.querySelector('.mcClinicalSearch');if(input)input.addEventListener('input',function(){diseaseList(root);});
+              root.querySelectorAll('[data-disease]').forEach(function(c){c.addEventListener('click',function(){diseaseDetail(root,c.getAttribute('data-disease'));});c.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();diseaseDetail(root,c.getAttribute('data-disease'));}});});
+            }
+            function diseaseDetail(root,id){
+              var d=getDiseases().find(function(x){return x.id===id;});if(!d)return;
+              var html='<button type="button" class="mcDiseaseBack">← All diseases</button><h2>'+esc(d.name)+'</h2><p>'+esc(d.summary)+'</p>';
+              Object.keys(d.sections||{}).forEach(function(k){var vals=d.sections[k]||[];html+='<section class="mcDiseaseSection"><h3>'+esc(k)+'</h3><ul>'+vals.map(function(v){return '<li>'+esc(v)+'</li>';}).join('')+'</ul></section>';});
+              html+='<section class="mcDiseaseSection mcDiseaseRefs"><h3>References / protocol basis</h3><ul>'+(d.refs||[]).map(function(v){return '<li>'+esc(v)+'</li>';}).join('')+'</ul></section>';
+              root.innerHTML=html;root.querySelector('.mcDiseaseBack').onclick=function(){diseaseList(root);};
+            }
+            function openDisease(){
+              var old=document.getElementById('medcalcDiseaseModal');if(old)old.remove();
+              var m=document.createElement('div');m.id='medcalcDiseaseModal';m.style.cssText='position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:12px';
+              m.innerHTML='<div class="mcClinicalWindow" style="background:var(--bg,#fff);color:var(--text,#111);width:min(1100px,100%);height:min(92vh,900px);border-radius:20px;overflow:hidden;display:flex;flex-direction:column"><div class="mcClinicalHead"><b>Diseases & Treatment</b><button class="mcClinicalClose" type="button">×</button></div><div class="mcClinicalBody" style="overflow:auto;flex:1;min-height:0;padding:20px"></div></div>';
+              document.body.appendChild(m);diseaseList(m.querySelector('.mcClinicalBody'));m.querySelector('.mcClinicalClose').onclick=function(){m.remove();};m.addEventListener('click',function(e){if(e.target===m)m.remove();});
+            }
+            function openDrugsAccordion(){
+              var data=window.MEDCALC_CLINICAL_CONTENT&&window.MEDCALC_CLINICAL_CONTENT.drugs;if(!data)return;
+              var old=document.getElementById('medcalcClinicalModal');if(old)old.remove();
+              var m=document.createElement('div');m.id='medcalcClinicalModal';m.innerHTML='<div class="mcClinicalWindow"><div class="mcClinicalHead"><b>Drug Reference</b><button class="mcClinicalClose" type="button">×</button></div><div class="mcClinicalBody"></div></div>';document.body.appendChild(m);
+              var root=m.querySelector('.mcClinicalBody');root.innerHTML='<h2>'+esc(data.title)+'</h2><p>'+esc(data.intro)+'</p><input class="mcClinicalSearch" placeholder="Search drugs or groups..."><div class="mcDrugGroups"></div>';
+              function render(){var q=(root.querySelector('.mcClinicalSearch').value||'').toLowerCase().trim();var out='';(data.groups||[]).forEach(function(g,gi){var items=(g.items||[]).filter(function(x){return !q||String(g.name).toLowerCase().indexOf(q)>=0||JSON.stringify(x).toLowerCase().indexOf(q)>=0;});if(!items.length)return;out+='<div class="mcDrugAccordion"><button class="mcDrugHead" aria-expanded="false" data-gi="'+gi+'"><span>💊 '+esc(g.name)+' <small style="opacity:.65">('+items.length+')</small></span><span class="chev">⌄</span></button><div class="mcDrugBody is-collapsed">'+items.map(function(x){return '<p><b>'+esc(x[0])+'</b><br>'+esc(x[1])+'<br>'+esc(x[2])+'<br><b>Important:</b> '+esc(x[3])+'<br><b>Monitor:</b> '+esc(x[4])+'</p>';}).join('')+'</div></div>';});root.querySelector('.mcDrugGroups').innerHTML=out||'<p>No matching drug found.</p>';root.querySelectorAll('.mcDrugHead').forEach(function(b){b.onclick=function(){var open=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',String(!open));b.nextElementSibling.classList.toggle('is-collapsed',open);};});}
+              root.querySelector('.mcClinicalSearch').addEventListener('input',render);render();m.querySelector('.mcClinicalClose').onclick=function(){m.remove();};m.addEventListener('click',function(e){if(e.target===m)m.remove();});
+            }
+            function enhanceSidebar(){
+              var box=document.getElementById('medcalcClinicalSidebar');if(!box||box.dataset.diseaseEnhanced)return;
+              box.dataset.diseaseEnhanced='1';
+              var drug=box.querySelector('button[data-mc-clinical="drugs"]');if(drug){drug.onclick=function(e){e.preventDefault();openDrugsAccordion();};}
+              var b=document.createElement('button');b.type='button';b.setAttribute('data-mc-disease','1');b.textContent='🧬 Diseases & Treatment';b.addEventListener('click',openDisease);box.appendChild(b);
+              var g=document.createElement('div');g.className='mcClinicalGroup';g.innerHTML='<button class="mcClinicalGroupHead" aria-expanded="false" type="button"><span>▾ Clinical Tools</span><span class="chev">⌄</span></button><div class="mcClinicalGroupBody is-collapsed"></div>';box.appendChild(g);
+              var body=g.querySelector('.mcClinicalGroupBody');
+              ['normalValues','examinations'].forEach(function(k){var src=box.querySelector('button[data-mc-clinical="'+k+'"]');if(src){body.appendChild(src);}});
+              var head=g.querySelector('.mcClinicalGroupHead');head.onclick=function(){var open=head.getAttribute('aria-expanded')==='true';head.setAttribute('aria-expanded',String(!open));body.classList.toggle('is-collapsed',open);};
+            }
+            function start(){enhanceSidebar();setTimeout(enhanceSidebar,700);setTimeout(enhanceSidebar,1800);setTimeout(enhanceSidebar,3500);}
+            if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+          })();
+          </script>
+          '''
+          if '</body>' in s:s=s.replace('</body>',block+'\n</body>',1)
+          else:s+=block
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit integration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then echo 'No integration changes'; else git commit -m 'Add Diseases and Treatment hub and improve sidebar'; git push; fi
