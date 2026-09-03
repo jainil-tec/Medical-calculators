@@ -9,24 +9,28 @@ permissions:
 
 jobs:
   apply:
-    if: ${{ !contains(github.event.head_commit.message, 'Apply detailed physical examination data') }}
+    if: ${{ !contains(github.event.head_commit.message, 'Wire examination diagrams into clinical layer') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Restore stable clinical data and append detailed examinations
+      - name: Ensure detailed examination and diagram layers
         run: |
-          git checkout 032f87e0611afb8a9693f9c2ab055d0c2e79a216 -- clinical-content-v1.js
-          cat examination-content-v3.js >> clinical-content-v1.js
+          if ! grep -q "MEDCALC_EXAMINATIONS_V3" clinical-content-v1.js; then
+            cat examination-content-v3.js >> clinical-content-v1.js
+          fi
+          if ! grep -q "medcalc-exam-media" clinical-content-v1.js; then
+            cat examination-media-v1.js >> clinical-content-v1.js
+          fi
       - name: Commit applied content if changed
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add clinical-content-v1.js
           if git diff --cached --quiet; then
-            echo 'Clinical examination layer already applied; nothing to commit.'
+            echo 'Clinical examination and diagram layers already applied; nothing to commit.'
             exit 0
           fi
-          git commit -m 'Apply detailed physical examination data'
+          git commit -m 'Apply examination diagrams'
           git push
