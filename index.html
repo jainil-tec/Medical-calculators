@@ -2075,5 +2075,77 @@ html.medcalc-modal-lock, html.medcalc-modal-lock body { overflow: hidden !import
 })();
 </script>
 
+
+<!-- MEDCALC_SIDEBAR_V2 -->
+<style id="MEDCALC_SIDEBAR_V2_STYLE">
+#medcalcClinicalSidebar .mcRefSection{margin:8px 0 0;border-top:1px solid rgba(127,127,127,.14);padding-top:7px}
+#medcalcClinicalSidebar .mcRefTitle{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;opacity:.62;padding:5px 10px}
+#medcalcClinicalSidebar .mcRefBtn{display:flex;align-items:center;gap:9px;width:100%;box-sizing:border-box;border:0;border-radius:10px;background:transparent;padding:9px 10px;font:inherit;font-weight:750;text-align:left;cursor:pointer}
+#medcalcClinicalSidebar .mcRefBtn:hover{background:rgba(127,127,127,.10)}
+#medcalcClinicalSidebar .mcRefBtn .mcRefIcon{width:20px;text-align:center;flex:0 0 20px}
+#medcalcClinicalSidebar .mcRefBtn .mcRefArrow{margin-left:auto;opacity:.55;font-size:12px}
+.mcDrugGroups{display:block}
+.mcDrugAccordion{border:1px solid rgba(127,127,127,.18);border-radius:12px;margin:9px 0;overflow:hidden;background:var(--card,#fff)}
+.mcDrugHead{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:transparent;padding:12px 14px;font:inherit;font-weight:800;text-align:left;cursor:pointer}
+.mcDrugHead .chev{transition:transform .18s}.mcDrugHead[aria-expanded="false"] .chev{transform:rotate(-90deg)}
+.mcDrugBody{padding:0 14px 12px}.mcDrugBody.is-collapsed{display:none}.mcDrugBody p{line-height:1.5;border-top:1px solid rgba(127,127,127,.12);padding-top:9px}
+</style>
+<script id="MEDCALC_SIDEBAR_V2_JS">
+(function(){
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function removeOldClinicalGroup(box){
+    box.querySelectorAll('.mcClinicalGroup').forEach(function(g){
+      var head=g.querySelector('.mcClinicalGroupHead');
+      if(head && /Clinical Tools/i.test(head.textContent||''))g.remove();
+    });
+  }
+  function makeRefButton(src,label,icon,handler){
+    if(!src)return null;
+    var b=document.createElement('button');b.type='button';b.className='mcRefBtn';b.innerHTML='<span class="mcRefIcon">'+icon+'</span><span>'+label+'</span><span class="mcRefArrow">›</span>';
+    b.addEventListener('click',function(e){e.preventDefault();handler();});
+    return b;
+  }
+  function openOriginal(src){src.click();}
+  function openDrugs(){
+    var data=window.MEDCALC_CLINICAL_CONTENT&&window.MEDCALC_CLINICAL_CONTENT.drugs;if(!data)return;
+    var old=document.getElementById('medcalcClinicalModal');if(old)old.remove();
+    var m=document.createElement('div');m.id='medcalcClinicalModal';m.innerHTML='<div class="mcClinicalWindow"><div class="mcClinicalHead"><b>Drug Reference</b><button class="mcClinicalClose" type="button">×</button></div><div class="mcClinicalBody"></div></div>';document.body.appendChild(m);
+    var root=m.querySelector('.mcClinicalBody');root.innerHTML='<h2>'+esc(data.title)+'</h2><p>'+esc(data.intro)+'</p><input class="mcClinicalSearch" placeholder="Search a medicine or category..." autocomplete="off"><div class="mcDrugGroups"></div>';
+    function render(){
+      var q=(root.querySelector('.mcClinicalSearch').value||'').toLowerCase().trim(),out='';
+      (data.groups||[]).forEach(function(g,gi){
+        var items=(g.items||[]).filter(function(x){return !q||String(g.name).toLowerCase().indexOf(q)>=0||JSON.stringify(x).toLowerCase().indexOf(q)>=0;});
+        if(!items.length)return;
+        out+='<div class="mcDrugAccordion"><button class="mcDrugHead" aria-expanded="false" data-gi="'+gi+'"><span>💊 '+esc(g.name)+' <small style="opacity:.65">('+items.length+')</small></span><span class="chev">⌄</span></button><div class="mcDrugBody is-collapsed">'+items.map(function(x){return '<p><b>'+esc(x[0])+'</b><br>'+esc(x[1])+'<br>'+esc(x[2])+'<br><b>Important:</b> '+esc(x[3])+'<br><b>Monitor:</b> '+esc(x[4])+'</p>';}).join('')+'</div></div>';
+      });
+      root.querySelector('.mcDrugGroups').innerHTML=out||'<p>No matching medicine found.</p>';
+      root.querySelectorAll('.mcDrugHead').forEach(function(b){b.onclick=function(){var open=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',String(!open));b.nextElementSibling.classList.toggle('is-collapsed',open);};});
+    }
+    root.querySelector('.mcClinicalSearch').addEventListener('input',render);render();
+    m.querySelector('.mcClinicalClose').onclick=function(){m.remove();};m.addEventListener('click',function(e){if(e.target===m)m.remove();});
+  }
+  function enhance(){
+    var box=document.getElementById('medcalcClinicalSidebar');if(!box||box.dataset.sidebarV2)return;
+    var normal=box.querySelector('button[data-mc-clinical="normalValues"]');
+    var exams=box.querySelector('button[data-mc-clinical="examinations"]');
+    var drugs=box.querySelector('button[data-mc-clinical="drugs"]');
+    var disease=box.querySelector('button[data-mc-disease="1"]');
+    if(!normal||!exams||!drugs)return;
+    box.dataset.sidebarV2='1';removeOldClinicalGroup(box);
+    var sec=document.createElement('div');sec.className='mcRefSection';
+    sec.innerHTML='<div class="mcRefTitle">Clinical Reference</div>';
+    var nb=makeRefButton(normal,'Normal Values','📊',function(){openOriginal(normal);});
+    var eb=makeRefButton(exams,'Examination','🩺',function(){openOriginal(exams);});
+    var db=makeRefButton(drugs,'Drug Reference','💊',openDrugs);
+    if(nb)sec.appendChild(nb);if(eb)sec.appendChild(eb);if(db)sec.appendChild(db);
+    box.appendChild(sec);
+    [normal,exams,drugs].forEach(function(x){if(x)x.style.display='none';});
+    if(disease){disease.style.display='flex';}
+  }
+  function start(){enhance();setTimeout(enhance,500);setTimeout(enhance,1200);setTimeout(enhance,2500);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
+</script>
+
 </body>
 </html>
