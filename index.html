@@ -1511,6 +1511,121 @@ document.getElementById('v14DoseBtn').onclick=function(){
 </script>
 
 
+
+<style id="v21Style">
+#v21Lab{position:fixed;inset:0;z-index:2147483646;background:rgba(2,8,23,.72);display:none;overflow:auto;padding:18px}
+#v21Lab.open{display:block}
+.v21Panel{max-width:1050px;margin:20px auto;background:var(--card,#fff);color:var(--text,#0f172a);border-radius:24px;box-shadow:0 25px 80px rgba(0,0,0,.28);overflow:hidden}
+.v21Top{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(100,116,139,.18)}
+.v21Top h2{margin:0;font-size:20px}.v21Close{border:0;background:transparent;font-size:30px;cursor:pointer}
+.v21Tabs{display:flex;gap:8px;padding:12px 16px;overflow:auto;border-bottom:1px solid rgba(100,116,139,.15)}
+.v21Tab{border:0;border-radius:999px;padding:10px 16px;cursor:pointer;background:rgba(59,130,246,.1);font-weight:700;white-space:nowrap}
+.v21Tab.active{background:#2563eb;color:#fff}
+.v21Body{padding:18px}.v21Grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.v21Card{border:1px solid rgba(100,116,139,.18);border-radius:18px;padding:16px;background:rgba(148,163,184,.045)}
+.v21Card h3{margin:0 0 12px}.v21Inputs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.v21Inputs label{font-size:12px;font-weight:700}.v21Inputs input,.v21Inputs select{width:100%;box-sizing:border-box;margin-top:5px;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:transparent;color:inherit}
+.v21Btn{border:0;border-radius:11px;padding:11px 15px;background:#2563eb;color:white;font-weight:800;cursor:pointer;margin-top:12px}
+.v21Result{margin-top:14px;padding:15px;border-radius:14px;background:rgba(37,99,235,.08);line-height:1.55}
+.v21Step{display:flex;gap:10px;margin:9px 0}.v21Num{min-width:25px;height:25px;border-radius:50%;background:#2563eb;color:#fff;text-align:center;line-height:25px;font-weight:800}
+.v21ECG{width:100%;height:210px;border-radius:14px;background:#fff;border:1px solid #cbd5e1;overflow:hidden}
+.v21ECG svg{width:100%;height:100%}.v21Learn{display:none}.v21Learn.active{display:block}
+.v21Q{font-size:18px;font-weight:800;margin-bottom:12px}.v21Opts{display:grid;gap:8px}.v21Opt{padding:12px;border:1px solid #cbd5e1;border-radius:12px;background:transparent;text-align:left;cursor:pointer;color:inherit}
+.v21Opt.correct{border-color:#16a34a;background:rgba(22,163,74,.12)}.v21Opt.wrong{border-color:#dc2626;background:rgba(220,38,38,.1)}
+.v21Small{font-size:12px;opacity:.75}.v21Source{font-size:11px;opacity:.7;margin-top:12px}
+@media(max-width:700px){#v21Lab{padding:7px}.v21Panel{margin:5px auto;border-radius:18px}.v21Grid{grid-template-columns:1fr}.v21Inputs{grid-template-columns:1fr 1fr}.v21Body{padding:12px}}
+</style>
+<div id="v21Lab" aria-hidden="true">
+ <div class="v21Panel">
+  <div class="v21Top"><h2>🧪 MedCalc Clinical Learning Lab <span class="v21Small">V21</span></h2><button class="v21Close" id="v21Close">×</button></div>
+  <div class="v21Tabs">
+   <button class="v21Tab active" data-v21tab="abg">🧪 ABG Analyzer</button>
+   <button class="v21Tab" data-v21tab="ecg">🫀 ECG Lab</button>
+   <button class="v21Tab" data-v21tab="quiz">🎯 Practice Quiz</button>
+  </div>
+  <div class="v21Body">
+   <section class="v21Learn active" id="v21abg">
+    <div class="v21Grid">
+     <div class="v21Card"><h3>Enter ABG values</h3>
+      <div class="v21Inputs">
+       <label>pH<input id="v21ph" type="number" step=".01" value="7.25"></label>
+       <label>PaCO₂ (mmHg)<input id="v21co2" type="number" value="30"></label>
+       <label>HCO₃⁻ (mEq/L)<input id="v21hco3" type="number" value="13"></label>
+       <label>Na⁺ (mEq/L)<input id="v21na" type="number" value="140"></label>
+       <label>Cl⁻ (mEq/L)<input id="v21cl" type="number" value="100"></label>
+       <label>Albumin (g/dL)<input id="v21alb" type="number" step=".1" value="4"></label>
+      </div><button class="v21Btn" id="v21Analyze">Analyze ABG</button>
+     </div>
+     <div class="v21Card"><h3>Step-by-step interpretation</h3><div id="v21ABGResult" class="v21Result">Enter values and tap <b>Analyze ABG</b>.</div></div>
+    </div>
+    <div class="v21Card" style="margin-top:14px"><b>Educational note:</b> The analyzer follows a structured six-step approach: validity/internal consistency, pH, primary respiratory/metabolic process, compensation, anion gap, and delta ratio. Clinical context is essential.</div>
+    <div class="v21Source">Reference: American Thoracic Society, Interpretation of Arterial Blood Gases. citeturn0search0</div>
+   </section>
+   <section class="v21Learn" id="v21ecg">
+    <div class="v21Grid">
+     <div class="v21Card"><h3>ECG quick measurements</h3>
+      <div class="v21Inputs">
+       <label>RR interval (large boxes)<input id="v21rr" type="number" step=".1" value="4"></label>
+       <label>PR interval (small boxes)<input id="v21pr" type="number" value="4"></label>
+       <label>QRS (small boxes)<input id="v21qrs" type="number" value="2"></label>
+       <label>QT (small boxes)<input id="v21qt" type="number" value="9"></label>
+      </div><button class="v21Btn" id="v21ECGCalc">Calculate</button>
+      <div id="v21ECGResult" class="v21Result"></div>
+     </div>
+     <div class="v21Card"><h3>Systematic ECG approach</h3>
+      <div class="v21Step"><span class="v21Num">1</span><div><b>Rate</b><br>Regular rhythm: 300 ÷ large boxes.</div></div>
+      <div class="v21Step"><span class="v21Num">2</span><div><b>Rhythm</b><br>Assess regularity, P waves and P–QRS relationship.</div></div>
+      <div class="v21Step"><span class="v21Num">3</span><div><b>Axis</b><br>Assess QRS axis systematically.</div></div>
+      <div class="v21Step"><span class="v21Num">4</span><div><b>Intervals</b><br>PR, QRS and QT/QTc.</div></div>
+      <div class="v21Step"><span class="v21Num">5</span><div><b>ST/T</b><br>Look for ischemic or repolarization abnormalities.</div></div>
+     </div>
+    </div>
+    <div class="v21Card" style="margin-top:14px"><h3>Practice tracing — regular sinus rhythm</h3>
+     <div class="v21ECG"><svg viewBox="0 0 1000 210" preserveAspectRatio="none">
+      <defs><pattern id="v21grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#f1b7b7" stroke-width=".7"/><path d="M100 0H0V100" fill="none" stroke="#df8d8d" stroke-width="1"/></pattern></defs>
+      <rect width="1000" height="210" fill="url(#v21grid)"/>
+      <path d="M0 108 L30 108 38 104 44 108 49 108 55 88 61 130 67 108 76 108 84 108 90 102 96 108 120 108 128 104 134 108 139 108 145 88 151 130 157 108 166 108 174 108 180 102 186 108 210 108 218 104 224 108 229 108 235 88 241 130 247 108 256 108 264 108 270 102 276 108 300 108 308 104 314 108 319 108 325 88 331 130 337 108 346 108 354 108 360 102 366 108 390 108 398 104 404 108 409 108 415 88 421 130 427 108 436 108 444 108 450 102 456 108 480 108 488 104 494 108 499 108 505 88 511 130 517 108 526 108 534 108 540 102 546 108 570 108 578 104 584 108 589 108 595 88 601 130 607 108 616 108 624 108 630 102 636 108 660 108 668 104 674 108 679 108 685 88 691 130 697 108 706 108 714 108 720 102 726 108 750 108 758 104 764 108 769 108 775 88 781 130 787 108 796 108 804 108 810 102 816 108 840 108 848 104 854 108 859 108 865 88 871 130 877 108 886 108 894 108 900 102 906 108 930 108 938 104 944 108 949 108 955 88 961 130 967 108 976 108 984 108 990 102 996 108" fill="none" stroke="#111827" stroke-width="2"/>
+     </svg></div>
+     <div class="v21Small" style="margin-top:8px">Illustrative educational tracing generated by MedCalc — not a diagnostic ECG.</div>
+    </div>
+    <div class="v21Source">References: NCBI ECG interpretation chapters emphasize a systematic approach including rate, rhythm, axis, intervals and ST/T analysis. citeturn0search1turn0search4</div>
+   </section>
+   <section class="v21Learn" id="v21quiz">
+    <div class="v21Card"><div class="v21Q" id="v21Q"></div><div class="v21Opts" id="v21Opts"></div><div id="v21Feedback" class="v21Result" style="display:none"></div><button class="v21Btn" id="v21Next">Next question</button></div>
+   </section>
+  </div>
+ </div>
+</div>
+<script id="v21Script">
+(()=>{const $=id=>document.getElementById(id), lab=$('v21Lab');
+function open(){lab.classList.add('open');lab.setAttribute('aria-hidden','false')}
+function close(){lab.classList.remove('open');lab.setAttribute('aria-hidden','true')}
+$('v21Close').onclick=close; lab.addEventListener('click',e=>{if(e.target===lab)close()});
+document.querySelectorAll('.v21Tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.v21Tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.v21Learn').forEach(x=>x.classList.toggle('active',x.id==='v21'+b.dataset.v21tab))});
+$('v21Analyze').onclick=()=>{
+ const ph=+$('v21ph').value,co2=+$('v21co2').value,h=+$('v21hco3').value,na=+$('v21na').value,cl=+$('v21cl').value,alb=+$('v21alb').value;
+ if(![ph,co2,h,na,cl,alb].every(Number.isFinite)||ph<6.8||ph>8){$('v21ABGResult').innerHTML='Please enter valid ABG values.';return}
+ const acid=ph<7.35, alk=ph>7.45, ag=na-(cl+h), corr=ag+2.5*(4-alb), dH=24-h, dAG=corr-12, ratio=dH>0?dAG/dH:null;
+ let primary=acid?(co2>40?'Respiratory acidosis':'Metabolic acidosis'):alk?(co2<40?'Respiratory alkalosis':'Metabolic alkalosis'):'pH in reference range';
+ let comp='Assess compensation from the primary disorder and clinical context.';
+ if(primary==='Metabolic acidosis'){let exp=1.5*h+8;comp=`Winter expected PaCO₂ ≈ ${exp.toFixed(1)} ± 2; observed ${co2}. ${Math.abs(co2-exp)<=2?'Compensation is broadly appropriate.':'Consider an additional respiratory disorder.'}`}
+ else if(primary==='Metabolic alkalosis'){let exp=40+0.6*(h-24);comp=`Expected PaCO₂ ≈ ${exp.toFixed(1)}; observed ${co2}.`}
+ else if(primary==='Respiratory acidosis'){let delta=co2-40;comp=`For respiratory acidosis, compare HCO₃⁻ rise with acute/chronic expected compensation; observed HCO₃⁻ = ${h}.`}
+ else if(primary==='Respiratory alkalosis'){let delta=40-co2;comp=`For respiratory alkalosis, compare HCO₃⁻ fall with acute/chronic expected compensation; observed HCO₃⁻ = ${h}.`}
+ let steps=[`pH ${ph.toFixed(2)} → ${acid?'acidemia':alk?'alkalemia':'within 7.35–7.45'}`,`Primary pattern: <b>${primary}</b>`,`Compensation: ${comp}`,`Anion gap = ${ag.toFixed(1)} mEq/L; albumin-corrected AG ≈ ${corr.toFixed(1)} mEq/L`,ratio!==null?`Delta ratio = ${ratio.toFixed(2)} ${ratio>=1&&ratio<=2?'(compatible with an uncomplicated AG metabolic acidosis range)':'(outside the usual 1–2 range; interpret with context)'}`:'Delta ratio not calculated because HCO₃⁻ is not below 24.',`Clinical correlation is essential; this tool is educational and does not diagnose or prescribe treatment.`];
+$('v21ABGResult').innerHTML=steps.map((x,i)=>`<div class="v21Step"><span class="v21Num">${i+1}</span><div>${x}</div></div>`).join('');
+};
+$('v21ECGCalc').onclick=()=>{let rr=+$('v21rr').value,pr=+$('v21pr').value,qrs=+$('v21qrs').value,qt=+$('v21qt').value;let rate=rr?300/rr:NaN;let prms=pr*40,qrsms=qrs*40,qtms=qt*40;let qtc=rate?qtms/Math.sqrt(60/rate):NaN;$('v21ECGResult').innerHTML=`Rate ≈ <b>${rate.toFixed(0)} bpm</b><br>PR ≈ <b>${prms} ms</b> · QRS ≈ <b>${qrsms} ms</b> · QT ≈ <b>${qtms} ms</b><br>QTc (Bazett, approximate) ≈ <b>${qtc.toFixed(0)} ms</b>`};
+const qs=[
+ ['A patient has pH 7.25, PaCO₂ 30 and HCO₃⁻ 13. What is the primary disorder?',['Metabolic acidosis','Respiratory acidosis','Metabolic alkalosis','Respiratory alkalosis'],0,'Low pH + low HCO₃⁻ indicates a primary metabolic acidosis pattern; PaCO₂ is reduced in compensation.'],
+ ['Which sequence is a useful systematic ECG approach?',['Rate → rhythm → axis → intervals → ST/T','Only look at the QRS','ST segment first in every ECG','Interpret only the machine report'],0,'A consistent systematic method reduces missed findings.'],
+ ['For an uncomplicated high-anion-gap metabolic acidosis, the delta ratio is commonly around:',['1–2','0–0.2','3–5','10–20'],0,'A delta ratio around 1–2 is the usual teaching range for an uncomplicated AG metabolic acidosis.']
+];
+let qi=0;function renderQ(){let q=qs[qi];$('v21Q').textContent=q[0];$('v21Feedback').style.display='none';$('v21Opts').innerHTML=q[1].map((o,i)=>`<button class="v21Opt" data-i="${i}">${String.fromCharCode(65+i)}. ${o}</button>`).join('');document.querySelectorAll('.v21Opt').forEach(b=>b.onclick=()=>{let ok=+b.dataset.i===q[2];b.classList.add(ok?'correct':'wrong');$('v21Feedback').style.display='block';$('v21Feedback').innerHTML=(ok?'✅ Correct. ':'❌ Not quite. ')+q[3]})}
+$('v21Next').onclick=()=>{qi=(qi+1)%qs.length;renderQ()};renderQ();
+window.openV21Lab=open;
+})();
+</script>
 <div id="v20DrugModal" class="v20Modal" aria-hidden="true">
  <div class="v20ModalPanel" role="dialog" aria-modal="true" aria-labelledby="v20DrugTitle">
   <button class="v20ModalClose" aria-label="Close">×</button>
@@ -1519,5 +1634,212 @@ document.getElementById('v14DoseBtn').onclick=function(){
   <div class="v20ModalBody"></div>
  </div>
 </div>
+
+<script>
+(()=>{function addLab(){const side=document.getElementById('v18Side');if(!side)return;const clinical=[...side.querySelectorAll('.v18Group')].find(g=>/Clinical Tools/i.test(g.innerText));if(!clinical)return;if(clinical.querySelector('[data-v21lab]'))return;const b=document.createElement('button');b.className='v18Item';b.setAttribute('data-v21lab','1');b.innerHTML='<span>🧪</span><span>ABG + ECG Learning Lab</span>';b.onclick=()=>{window.openV21Lab?.();side.classList.remove('open');document.getElementById('v18Shade')?.classList.remove('open')};const head=clinical.querySelector('.v18GroupHead');head?.after(b)};addLab();setTimeout(addLab,500);})();
+</script>
+<style id="v22Style">
+#v22Ref{position:fixed;inset:0;background:rgba(2,6,23,.62);z-index:2147483645;display:none;align-items:center;justify-content:center;padding:12px}
+#v22Ref.open{display:flex}.v22Panel{width:min(1050px,100%);height:min(92vh,900px);background:var(--card,#fff);color:var(--text,#172033);border-radius:22px;overflow:hidden;box-shadow:0 30px 90px #02061755;display:flex;flex-direction:column}.v22Top{padding:16px 18px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px}.v22Top h2{margin:0;font-size:20px}.v22Close{margin-left:auto;border:0;background:#eef2f7;border-radius:12px;width:38px;height:38px;font-size:24px;cursor:pointer}.v22Search{margin-left:auto;width:min(320px,42vw);padding:10px 13px;border:1px solid #dbe3ec;border-radius:12px}.v22Body{display:flex;min-height:0;flex:1}.v22Nav{width:220px;border-right:1px solid #e5e7eb;padding:12px;overflow:auto}.v22Nav button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:11px 12px;border-radius:10px;cursor:pointer;font-weight:700;color:inherit}.v22Nav button.active,.v22Nav button:hover{background:#e8f1ff;color:#1d4ed8}.v22Content{flex:1;overflow:auto;padding:20px}.v22Section{display:none}.v22Section.active{display:block}.v22Hero{padding:18px;border-radius:16px;background:linear-gradient(135deg,#eff6ff,#f8fafc);margin-bottom:16px}.v22Hero h3{margin:0 0 6px}.v22Grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.v22Card{border:1px solid #e5e7eb;border-radius:15px;padding:15px;background:var(--card,#fff)}.v22Card h4{margin:0 0 8px}.v22Card ul{margin:6px 0 0;padding-left:20px}.v22Pill{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;margin:2px}.v22Note{font-size:12px;opacity:.72;margin-top:14px}.v22Table{width:100%;border-collapse:collapse;font-size:14px}.v22Table th,.v22Table td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:left}.v22Filter{font-size:13px;opacity:.7;margin-bottom:10px}.v22Hidden{display:none!important}
+body.dark #v22Ref .v22Panel{background:#111827;color:#f8fafc}.dark #v22Ref .v22Top,.dark #v22Ref .v22Nav{border-color:#334155}.dark #v22Ref .v22Close{background:#1f2937;color:#fff}.dark #v22Ref .v22Search{background:#0f172a;color:#fff;border-color:#475569}.dark #v22Ref .v22Card{background:#111827;border-color:#334155}.dark #v22Ref .v22Hero{background:#172554}.dark #v22Ref .v22Table th,.dark #v22Ref .v22Table td{border-color:#334155}
+@media(max-width:700px){.v22Body{display:block}.v22Nav{width:auto;border-right:0;border-bottom:1px solid #e5e7eb;display:flex;overflow-x:auto;gap:6px}.v22Nav button{min-width:max-content}.v22Grid{grid-template-columns:1fr}.v22Search{width:38vw}.v22Top h2{font-size:17px}}
+</style>
+<div id="v22Ref" aria-hidden="true"><div class="v22Panel" role="dialog" aria-modal="true" aria-labelledby="v22Title">
+<div class="v22Top"><h2 id="v22Title">📚 Clinical Reference Hub</h2><input id="v22Search" class="v22Search" placeholder="Search reference…"><button id="v22Close" class="v22Close">×</button></div>
+<div class="v22Body"><nav class="v22Nav" id="v22Nav">
+<button class="active" data-v22="overview">🏠 Overview</button><button data-v22="normal">🧪 Normal Values</button><button data-v22="medicine">🩺 Medicine</button><button data-v22="surgery">🔪 Surgery</button><button data-v22="obgyn">🤰 OBGYN</button><button data-v22="peds">👶 Pediatrics</button><button data-v22="emergency">🚨 Emergency</button><button data-v22="exam">🧑‍⚕️ Examination</button>
+</nav><main class="v22Content" id="v22Content">
+<section class="v22Section active" id="v22-overview"><div class="v22Hero"><h3>Clinical Reference Hub</h3><p>Fast, structured revision for common clinical topics, bedside concepts and exam preparation.</p><span class="v22Pill">MBBS</span><span class="v22Pill">NEET-PG</span><span class="v22Pill">Clinical quick reference</span></div><div class="v22Grid">
+<div class="v22Card"><h4>🧪 Investigations</h4><p>ABG, CBC, renal function, liver function, electrolytes, coagulation and common reference ranges.</p></div><div class="v22Card"><h4>🩺 Medicine</h4><p>Approach to chest pain, dyspnea, anemia, edema, jaundice, AKI, electrolyte disorders and common emergencies.</p></div><div class="v22Card"><h4>🤰 OBGYN</h4><p>Labour, PPH, hypertensive disorders of pregnancy, antenatal assessment and common obstetric terminology.</p></div><div class="v22Card"><h4>🚨 Emergency</h4><p>Structured first assessment, ABCDE, triage concepts and emergency checklists.</p></div></div><p class="v22Note">Educational reference only. Always verify patient-care decisions against current local/institutional guidelines.</p></section>
+<section class="v22Section" id="v22-normal"><div class="v22Hero"><h3>🧪 Common Reference Values</h3><p class="v22Filter">Ranges vary by laboratory, method, age and clinical context.</p></div><table class="v22Table"><thead><tr><th>Parameter</th><th>Typical adult reference</th><th>Unit</th></tr></thead><tbody>
+<tr><td>Hemoglobin</td><td>Male ~13.5–17.5; Female ~12–16</td><td>g/dL</td></tr><tr><td>WBC</td><td>4–11</td><td>×10⁹/L</td></tr><tr><td>Platelets</td><td>150–400</td><td>×10⁹/L</td></tr><tr><td>Na⁺</td><td>135–145</td><td>mmol/L</td></tr><tr><td>K⁺</td><td>3.5–5.0</td><td>mmol/L</td></tr><tr><td>Creatinine</td><td>Lab-dependent</td><td>mg/dL</td></tr><tr><td>Glucose, fasting</td><td>~70–99</td><td>mg/dL</td></tr><tr><td>TSH</td><td>Lab-dependent</td><td>mIU/L</td></tr><tr><td>INR</td><td>~0.8–1.2</td><td>ratio</td></tr><tr><td>ABG pH</td><td>7.35–7.45</td><td>—</td></tr><tr><td>PaCO₂</td><td>35–45</td><td>mmHg</td></tr><tr><td>HCO₃⁻</td><td>22–26</td><td>mmol/L</td></tr></tbody></table><p class="v22Note">These are educational approximate ranges, not substitutes for the reporting laboratory's reference interval.</p></section>
+<section class="v22Section" id="v22-medicine"><div class="v22Hero"><h3>🩺 Medicine Quick Reference</h3></div><div class="v22Grid">
+<div class="v22Card"><h4>Chest pain approach</h4><ul><li>Immediate vital signs and focused history</li><li>12-lead ECG early when ACS is suspected</li><li>Assess instability and red flags</li><li>Use validated pathways where applicable</li></ul></div>
+<div class="v22Card"><h4>Dyspnea approach</h4><ul><li>Assess airway, breathing and oxygenation</li><li>Look for pulmonary, cardiac and metabolic causes</li><li>ECG, chest imaging and targeted labs as indicated</li></ul></div>
+<div class="v22Card"><h4>Anemia approach</h4><ul><li>Start with CBC and MCV</li><li>Consider reticulocytes and peripheral smear</li><li>Use iron/B12/folate/hemolysis testing according to pattern</li></ul></div>
+<div class="v22Card"><h4>AKI approach</h4><ul><li>Confirm change in kidney function</li><li>Review volume status and medications</li><li>Exclude obstruction when clinically indicated</li><li>Look for urgent complications such as severe hyperkalemia</li></ul></div>
+</div></section>
+<section class="v22Section" id="v22-surgery"><div class="v22Hero"><h3>🔪 Surgery Quick Reference</h3></div><div class="v22Grid"><div class="v22Card"><h4>Acute abdomen</h4><ul><li>ABCDE and hemodynamic assessment</li><li>Focused abdominal examination</li><li>Identify peritonitis, obstruction, ischemia or bleeding</li><li>Early surgical review when indicated</li></ul></div><div class="v22Card"><h4>Trauma</h4><ul><li>Structured primary survey</li><li>Control catastrophic bleeding</li><li>Assess airway, breathing and circulation</li><li>Repeat assessment after interventions</li></ul></div><div class="v22Card"><h4>Post-op fever</h4><ul><li>Review timing and procedure</li><li>Assess wound, lungs, urine, lines and thromboembolic risk</li><li>Investigate based on clinical findings</li></ul></div><div class="v22Card"><h4>Wound basics</h4><ul><li>Assess contamination, tissue viability and neurovascular status</li><li>Document mechanism and time</li><li>Consider tetanus and infection risk according to local guidance</li></ul></div></div></section>
+<section class="v22Section" id="v22-obgyn"><div class="v22Hero"><h3>🤰 OBGYN Quick Reference</h3></div><div class="v22Grid"><div class="v22Card"><h4>Labour</h4><ul><li>Assess maternal and fetal status</li><li>Document cervical change and descent</li><li>Monitor fetal heart rate according to local protocol</li><li>Recognize prolonged/obstructed labour</li></ul></div><div class="v22Card"><h4>Postpartum hemorrhage</h4><ul><li>Call for help and assess hemodynamic status</li><li>Identify the cause systematically</li><li>Uterine atony, retained tissue, trauma and coagulopathy are key categories</li><li>Follow local PPH protocol immediately</li></ul></div><div class="v22Card"><h4>Hypertensive disorders</h4><ul><li>Confirm blood pressure and assess symptoms</li><li>Check for severe features/organ involvement</li><li>Monitor mother and fetus</li><li>Use current obstetric protocols for treatment and timing of delivery</li></ul></div><div class="v22Card"><h4>Antenatal assessment</h4><ul><li>Gestational age and dating</li><li>Maternal vitals and risk assessment</li><li>Fetal growth and wellbeing as appropriate</li><li>Screening according to local recommendations</li></ul></div></div></section>
+<section class="v22Section" id="v22-peds"><div class="v22Hero"><h3>👶 Pediatrics Quick Reference</h3></div><div class="v22Grid"><div class="v22Card"><h4>Child assessment</h4><ul><li>Appearance, work of breathing and circulation</li><li>Age-specific vital signs</li><li>Weight is essential for many medication calculations</li><li>Use pediatric reference ranges</li></ul></div><div class="v22Card"><h4>Dehydration</h4><ul><li>Assess mental status, perfusion, mucous membranes and urine output</li><li>Estimate severity using age-appropriate clinical criteria</li><li>Choose oral or IV rehydration according to severity and local guidance</li></ul></div><div class="v22Card"><h4>Neonatal red flags</h4><ul><li>Respiratory distress</li><li>Temperature instability</li><li>Poor feeding/lethargy</li><li>Cyanosis, seizures or abnormal perfusion</li></ul></div><div class="v22Card"><h4>Medication safety</h4><ul><li>Verify weight in kg</li><li>Check concentration and route</li><li>Calculate dose and maximum dose independently</li><li>Double-check high-alert medicines</li></ul></div></div></section>
+<section class="v22Section" id="v22-emergency"><div class="v22Hero"><h3>🚨 Emergency Quick Reference</h3><p>Use a structured approach and activate local emergency protocols for unstable patients.</p></div><div class="v22Grid"><div class="v22Card"><h4>ABCDE</h4><ol><li>Airway</li><li>Breathing</li><li>Circulation</li><li>Disability</li><li>Exposure / environment</li></ol></div><div class="v22Card"><h4>Red flags</h4><ul><li>Airway compromise</li><li>Severe respiratory distress</li><li>Shock or rapidly worsening perfusion</li><li>Altered consciousness</li><li>Major bleeding or severe chest pain</li></ul></div><div class="v22Card"><h4>Emergency checklist principle</h4><p>Recognize critical illness early, stabilize immediately, reassess after interventions, and arrange definitive care/referral when needed.</p></div><div class="v22Card"><h4>Useful MedCalc tools</h4><p>ABG Analyzer · ECG Lab · GCS · qSOFA · MAP · eGFR · drug reference</p></div></div><p class="v22Note">WHO's Emergency Care Toolkit emphasizes systematic care of acutely ill and injured patients and provides emergency checklists and resuscitation tools. citeturn0search2turn0search3</p></section>
+<section class="v22Section" id="v22-exam"><div class="v22Hero"><h3>🧑‍⚕️ Clinical Examination</h3></div><div class="v22Grid"><div class="v22Card"><h4>General examination</h4><ul><li>Appearance, consciousness and orientation</li><li>Build, nutrition and hydration</li><li>Pallor, icterus, cyanosis, clubbing, lymph nodes, edema</li><li>Vitals and relevant measurements</li></ul></div><div class="v22Card"><h4>Respiratory</h4><ul><li>Inspection → palpation → percussion → auscultation</li><li>Assess respiratory effort and symmetry</li><li>Characterize added sounds</li></ul></div><div class="v22Card"><h4>Cardiovascular</h4><ul><li>Pulse and blood pressure</li><li>JVP and peripheral edema</li><li>Precordial inspection/palpation</li><li>Heart sounds and murmurs</li></ul></div><div class="v22Card"><h4>Abdomen</h4><ul><li>Inspection → auscultation → percussion → palpation</li><li>Assess tenderness, guarding and organomegaly</li><li>Look for ascites and hernias where relevant</li></ul></div></div></section>
+</main></div></div></div>
+<script id="v22Script">(()=>{const modal=document.getElementById('v22Ref');const close=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true')};const open=()=>{modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.getElementById('v22Search').focus()};document.getElementById('v22Close').onclick=close;modal.addEventListener('click',e=>{if(e.target===modal)close()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))close()});document.querySelectorAll('#v22Nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#v22Nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.v22Section').forEach(s=>s.classList.toggle('active',s.id==='v22-'+b.dataset.v22));document.getElementById('v22Search').value=''});document.getElementById('v22Search').oninput=e=>{const q=e.target.value.toLowerCase().trim();document.querySelectorAll('#v22Content .v22Card').forEach(c=>c.classList.toggle('v22Hidden',q&&!c.innerText.toLowerCase().includes(q))) };window.openV22Ref=open;function addSide(){const side=document.getElementById('v18Side');if(!side||side.querySelector('[data-v22ref]'))return;const groups=[...side.querySelectorAll('.v18Group')];const target=groups.find(g=>/Clinical Tools/i.test(g.innerText))||side;const b=document.createElement('button');b.className='v18Item';b.setAttribute('data-v22ref','1');b.innerHTML='<span>📚</span><span>Clinical Reference Hub</span>';b.onclick=()=>{open();side.classList.remove('open');document.getElementById('v18Shade')?.classList.remove('open')};const head=target.querySelector('.v18GroupHead');head?head.after(b):side.appendChild(b)}addSide();setTimeout(addSide,300);setTimeout(addSide,1000)})();</script>
+
+
+<!-- MEDCALC_V23_EMERGENCY_ALGORITHMS -->
+<style id="MEDCALC_V23_EMERGENCY_ALGORITHMS">
+#v23Ref{position:fixed;inset:0;background:rgba(2,6,23,.62);z-index:2147483000;display:none;align-items:center;justify-content:center;padding:12px}
+#v23Ref.open{display:flex}
+.v23Panel{width:min(1120px,100%);height:min(94vh,920px);background:var(--card,#fff);color:var(--text,#172033);border-radius:24px;overflow:hidden;box-shadow:0 30px 100px #02061766;display:flex;flex-direction:column}
+.v23Top{padding:15px 18px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px}
+.v23Top h2{margin:0;font-size:20px}.v23Top small{opacity:.65}.v23Close{margin-left:auto;border:0;background:#eef2f7;border-radius:12px;width:40px;height:40px;font-size:24px;cursor:pointer}
+.v23Body{display:flex;min-height:0;flex:1}.v23Nav{width:245px;border-right:1px solid #e5e7eb;padding:12px;overflow:auto}
+.v23Nav button{width:100%;text-align:left;border:0;background:transparent;padding:11px 12px;border-radius:11px;cursor:pointer;font-weight:750;color:inherit}
+.v23Nav button.active,.v23Nav button:hover{background:#e8f1ff;color:#1d4ed8}
+.v23Content{flex:1;overflow:auto;padding:20px}.v23Section{display:none}.v23Section.active{display:block}
+.v23Hero{padding:18px;border-radius:17px;background:linear-gradient(135deg,#eff6ff,#f8fafc);margin-bottom:15px}
+.v23Hero h3{margin:0 0 6px}.v23Grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.v23Card{border:1px solid #e5e7eb;border-radius:16px;padding:15px;background:var(--card,#fff)}
+.v23Card h4{margin:0 0 8px}.v23Card ol,.v23Card ul{margin:7px 0 0;padding-left:22px}.v23Card li{margin:5px 0}
+.v23Step{display:flex;gap:12px;align-items:flex-start;padding:13px;border:1px solid #e5e7eb;border-radius:14px;margin:9px 0}
+.v23Num{min-width:30px;height:30px;border-radius:10px;background:#2563eb;color:#fff;display:grid;place-items:center;font-weight:800}
+.v23Warn{border-left:4px solid #f59e0b;background:#fffbeb;padding:12px 14px;border-radius:10px;margin-top:12px}
+.v23Good{border-left:4px solid #10b981;background:#ecfdf5;padding:12px 14px;border-radius:10px;margin-top:12px}
+.v23Tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;font-size:12px;margin:2px}
+.v23Search{margin-left:auto;width:min(300px,38vw);padding:10px 12px;border:1px solid #dbe3ec;border-radius:12px}
+.v23Note{font-size:12px;opacity:.72;margin-top:14px}.v23Hidden{display:none!important}
+body.dark #v23Ref .v23Panel{background:#111827;color:#f8fafc}
+.dark #v23Ref .v23Top,.dark #v23Ref .v23Nav{border-color:#334155}.dark #v23Ref .v23Close{background:#1f2937;color:#fff}
+.dark #v23Ref .v23Search{background:#0f172a;color:#fff;border-color:#475569}.dark #v23Ref .v23Card{background:#111827;border-color:#334155}
+.dark #v23Ref .v23Hero{background:#172554}.dark #v23Ref .v23Step{border-color:#334155}
+@media(max-width:700px){.v23Body{display:block}.v23Nav{width:auto;border-right:0;border-bottom:1px solid #e5e7eb;display:flex;overflow-x:auto;gap:6px}.v23Nav button{min-width:max-content}.v23Grid{grid-template-columns:1fr}.v23Search{width:32vw}.v23Top h2{font-size:17px}}
+</style>
+
+<div id="v23Ref" aria-hidden="true">
+  <div class="v23Panel" role="dialog" aria-modal="true" aria-labelledby="v23Title">
+    <div class="v23Top">
+      <div><h2 id="v23Title">🚨 Emergency Algorithms</h2><small>Structured educational quick-reference</small></div>
+      <input id="v23Search" class="v23Search" placeholder="Search algorithm…">
+      <button id="v23Close" class="v23Close" aria-label="Close">×</button>
+    </div>
+    <div class="v23Body">
+      <nav class="v23Nav" id="v23Nav">
+        <button class="active" data-v23="overview">🚨 Overview</button>
+        <button data-v23="abcde">🫁 ABCDE</button>
+        <button data-v23="shock">🩸 Shock</button>
+        <button data-v23="breathing">🫁 Breathing</button>
+        <button data-v23="ams">🧠 Altered Mental Status</button>
+        <button data-v23="trauma">🩹 Trauma</button>
+        <button data-v23="pph">🤰 PPH</button>
+        <button data-v23="handover">📋 Review & Handover</button>
+      </nav>
+      <main class="v23Content" id="v23Content">
+        <section class="v23Section active" id="v23-overview">
+          <div class="v23Hero"><h3>Emergency care: think, act, reassess</h3>
+            <p>Use a structured approach to recognize critical illness, correct immediate threats, reassess response and arrange definitive care or referral.</p>
+            <span class="v23Tag">ABCDE</span><span class="v23Tag">Resuscitation</span><span class="v23Tag">Reassessment</span><span class="v23Tag">Referral</span>
+          </div>
+          <div class="v23Grid">
+            <div class="v23Card"><h4>1. Recognize</h4><p>Identify the acutely ill patient and move to an appropriate resuscitation area when indicated.</p></div>
+            <div class="v23Card"><h4>2. Resuscitate</h4><p>Use ABCDE systematically and address life threats as they are found.</p></div>
+            <div class="v23Card"><h4>3. Review</h4><p>Recheck vital signs and repeat ABCDE after interventions or any deterioration.</p></div>
+            <div class="v23Card"><h4>4. Refer</h4><p>If ongoing care exceeds local capability, arrange safe transfer to an appropriate facility.</p></div>
+          </div>
+          <div class="v23Warn"><b>Clinical safety:</b> This is an educational quick-reference, not a substitute for local protocols, senior clinical support, or definitive emergency-care guidance.</div>
+        </section>
+
+        <section class="v23Section" id="v23-abcde">
+          <div class="v23Hero"><h3>🫁 ABCDE Primary Survey</h3><p>Work through each domain, treat immediate threats, then reassess.</p></div>
+          <div class="v23Step"><b class="v23Num">A</b><div><b>Airway</b><br>Look for obstruction, gurgling, stridor or absent air movement. Open the airway, suction/remove visible obstruction when appropriate, and escalate early if the airway cannot be maintained.</div></div>
+          <div class="v23Step"><b class="v23Num">B</b><div><b>Breathing</b><br>Assess work of breathing, respiratory pattern, oxygenation and breath sounds. Support oxygenation/ventilation as clinically indicated and identify immediately life-threatening causes.</div></div>
+          <div class="v23Step"><b class="v23Num">C</b><div><b>Circulation</b><br>Assess pulse, blood pressure, skin/perfusion and major bleeding. Control major bleeding and provide appropriate circulatory support while seeking the cause.</div></div>
+          <div class="v23Step"><b class="v23Num">D</b><div><b>Disability</b><br>Assess mental status (for example AVPU/GCS), pupils and blood glucose. Look for seizures or focal neurological signs.</div></div>
+          <div class="v23Step"><b class="v23Num">E</b><div><b>Exposure / Environment</b><br>Expose enough to identify hidden injury, rash or other findings while preventing hypothermia and preserving dignity.</div></div>
+          <div class="v23Good"><b>After every intervention:</b> reassess airway, breathing and circulation and repeat the primary survey if the patient's condition changes.</div>
+        </section>
+
+        <section class="v23Section" id="v23-shock">
+          <div class="v23Hero"><h3>🩸 Shock: rapid approach</h3><p>Shock is a time-critical syndrome. Identify poor perfusion, look for the cause and treat reversible threats while escalating care.</p></div>
+          <div class="v23Grid">
+            <div class="v23Card"><h4>Recognize</h4><ul><li>Hypotension or narrowing pulse pressure</li><li>Tachycardia or abnormal pulse</li><li>Cool/clammy skin or abnormal capillary refill</li><li>Altered mental status</li><li>Reduced urine output</li></ul></div>
+            <div class="v23Card"><h4>Look for cause</h4><ul><li>Hemorrhage / fluid loss</li><li>Sepsis / distributive shock</li><li>Cardiac causes</li><li>Obstructive causes</li><li>Anaphylaxis and other reversible emergencies</li></ul></div>
+          </div>
+          <div class="v23Step"><b class="v23Num">1</b><div>Start with ABCDE and obtain vital signs/monitoring appropriate to the setting.</div></div>
+          <div class="v23Step"><b class="v23Num">2</b><div>Control obvious major bleeding and identify immediately reversible causes.</div></div>
+          <div class="v23Step"><b class="v23Num">3</b><div>Provide cause-directed resuscitation according to local protocol and patient context; reassess response frequently.</div></div>
+          <div class="v23Step"><b class="v23Num">4</b><div>Escalate to senior/critical-care support and arrange definitive treatment or transfer when required.</div></div>
+          <div class="v23Warn"><b>Do not treat a blood-pressure number in isolation.</b> Reassess perfusion, mental status, respiratory status and response to interventions.</div>
+        </section>
+
+        <section class="v23Section" id="v23-breathing">
+          <div class="v23Hero"><h3>🫁 Difficulty Breathing</h3><p>Rapidly determine whether oxygenation or ventilation is failing and search for immediately reversible causes.</p></div>
+          <div class="v23Grid">
+            <div class="v23Card"><h4>Immediate danger signs</h4><ul><li>Severe work of breathing</li><li>Cyanosis or severe hypoxemia</li><li>Exhaustion / altered consciousness</li><li>Very abnormal respiratory pattern</li><li>Unilateral absent breath sounds with suspected tension physiology</li></ul></div>
+            <div class="v23Card"><h4>Focused causes</h4><ul><li>Asthma / bronchospasm</li><li>Pneumonia or severe infection</li><li>Pulmonary edema</li><li>Pneumothorax</li><li>Upper-airway obstruction</li></ul></div>
+          </div>
+          <div class="v23Good"><b>Principle:</b> support oxygenation/ventilation while identifying and treating the underlying cause; reassess continuously.</div>
+        </section>
+
+        <section class="v23Section" id="v23-ams">
+          <div class="v23Hero"><h3>🧠 Altered Mental Status</h3><p>Protect airway when needed and rapidly search for reversible causes.</p></div>
+          <div class="v23Step"><b class="v23Num">1</b><div>ABCDE first. Assess responsiveness using AVPU/GCS and protect the airway if protective reflexes are inadequate.</div></div>
+          <div class="v23Step"><b class="v23Num">2</b><div><b>Check glucose early.</b> Hypoglycemia is a rapidly reversible cause of altered consciousness.</div></div>
+          <div class="v23Step"><b class="v23Num">3</b><div>Consider seizures, intoxication/overdose, hypoxia, shock, infection, metabolic disturbance and neurological emergencies.</div></div>
+          <div class="v23Step"><b class="v23Num">4</b><div>Look for head trauma, unequal/fixed pupils or focal neurological findings and escalate urgently when present.</div></div>
+        </section>
+
+        <section class="v23Section" id="v23-trauma">
+          <div class="v23Hero"><h3>🩹 Trauma: first priorities</h3><p>Use the trauma pathway/local trauma protocol and do not let secondary assessment delay treatment of immediate life threats.</p></div>
+          <div class="v23Grid">
+            <div class="v23Card"><h4>Primary survey</h4><ol><li>Airway with appropriate spine precautions</li><li>Breathing</li><li>Circulation / catastrophic hemorrhage</li><li>Disability</li><li>Exposure while preventing hypothermia</li></ol></div>
+            <div class="v23Card"><h4>Then</h4><ul><li>Reassess after interventions</li><li>Perform secondary survey when stable</li><li>Document findings and interventions</li><li>Arrange appropriate imaging/specialist care</li><li>Transfer early if capability is limited</li></ul></div>
+          </div>
+        </section>
+
+        <section class="v23Section" id="v23-pph">
+          <div class="v23Hero"><h3>🤰 Postpartum Haemorrhage</h3><p>PPH is time-critical. Activate the local obstetric haemorrhage protocol and obtain senior help immediately.</p></div>
+          <div class="v23Step"><b class="v23Num">1</b><div>Recognize significant postpartum bleeding and assess maternal ABCDE/hemodynamic status.</div></div>
+          <div class="v23Step"><b class="v23Num">2</b><div>Call for help, establish appropriate monitoring/access and begin coordinated haemorrhage management according to current local/WHO-aligned protocol.</div></div>
+          <div class="v23Step"><b class="v23Num">3</b><div>Look for the cause and address it promptly while resuscitation continues.</div></div>
+          <div class="v23Step"><b class="v23Num">4</b><div>Reassess bleeding, perfusion and response continuously; escalate to definitive obstetric/surgical/interventional care when required.</div></div>
+          <div class="v23Warn"><b>Protocol note:</b> PPH guidance has been updated by WHO; use the current local/national obstetric haemorrhage protocol for exact medication choices, doses and thresholds.</div>
+        </section>
+
+        <section class="v23Section" id="v23-handover">
+          <div class="v23Hero"><h3>📋 Review, document & hand over</h3><p>Emergency care does not end after the first intervention.</p></div>
+          <div class="v23Grid">
+            <div class="v23Card"><h4>Reassess</h4><ul><li>Repeat vital signs</li><li>Repeat ABCDE if condition changes</li><li>Confirm response to each intervention</li></ul></div>
+            <div class="v23Card"><h4>SAMPLE history</h4><ul><li>Symptoms</li><li>Allergies</li><li>Medications</li><li>Past medical history</li><li>Last oral intake</li><li>Events leading to illness/injury</li></ul></div>
+            <div class="v23Card"><h4>Handover</h4><p>Give a concise structured handover including current condition, key findings, interventions, response and outstanding concerns.</p></div>
+            <div class="v23Card"><h4>Transfer</h4><p>If definitive care is unavailable locally, prepare and arrange safe transfer without unnecessary delay.</p></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</div>
+
+<script id="MEDCALC_V23_EMERGENCY_ALGORITHMS">
+(()=> {
+  const modal=document.getElementById('v23Ref');
+  const open=()=>{modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.getElementById('v23Search').focus()};
+  const close=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true')};
+  document.getElementById('v23Close').onclick=close;
+  modal.addEventListener('click',e=>{if(e.target===modal)close()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))close()});
+  const buttons=[...document.querySelectorAll('#v23Nav button')];
+  const sections=[...document.querySelectorAll('#v23Content .v23Section')];
+  buttons.forEach(b=>b.onclick=()=>{
+    buttons.forEach(x=>x.classList.toggle('active',x===b));
+    sections.forEach(s=>s.classList.toggle('active',s.id==='v23-'+b.dataset.v23));
+    document.getElementById('v23Search').value='';
+    sections.forEach(c=>c.querySelectorAll('.v23Card,.v23Step').forEach(x=>x.classList.remove('v23Hidden')));
+  });
+  document.getElementById('v23Search').oninput=e=>{
+    const q=e.target.value.toLowerCase().trim();
+    const active=document.querySelector('#v23Content .v23Section.active');
+    active.querySelectorAll('.v23Card,.v23Step').forEach(c=>c.classList.toggle('v23Hidden',!!q&&!c.innerText.toLowerCase().includes(q)));
+  };
+  window.openV23Emergency=open;
+
+  function addSide(){
+    const side=document.getElementById('v18Side');
+    if(!side || side.querySelector('[data-v23emergency]')) return;
+    const groups=[...side.querySelectorAll('.v18Group')];
+    const target=groups.find(g=>/Clinical Tools/i.test(g.innerText))||side;
+    const b=document.createElement('button');
+    b.className='v18Item';
+    b.setAttribute('data-v23emergency','1');
+    b.innerHTML='<span class="v18Icon">🚨</span><span>Emergency Algorithms</span>';
+    b.onclick=()=>{open();side.classList.remove('open');document.getElementById('v18Shade')?.classList.remove('open')};
+    const head=target.querySelector('.v18GroupHead');
+    head ? head.after(b) : side.appendChild(b);
+  }
+  addSide(); setTimeout(addSide,300); setTimeout(addSide,1000);
+})();
+</script>
+
 </body>
 </html>
