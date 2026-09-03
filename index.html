@@ -2147,5 +2147,45 @@ html.medcalc-modal-lock, html.medcalc-modal-lock body { overflow: hidden !import
 })();
 </script>
 
+
+<!-- MEDCALC_DISEASE_HUB_V3 -->
+<style>
+.mcDiseaseBtn{display:flex;align-items:center;gap:9px;width:100%;box-sizing:border-box;border:0;border-radius:10px;background:transparent;padding:10px;color:inherit;font:inherit;font-weight:800;text-align:left;cursor:pointer}
+.mcDiseaseBtn:hover{background:rgba(127,127,127,.10)}
+.mcDiseaseModal{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.52);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+.mcDiseaseWindow{width:min(900px,100%);max-height:min(90vh,900px);overflow:auto;background:var(--card,#fff);color:var(--text,#111);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.mcDiseaseHead{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid rgba(127,127,127,.16);background:inherit;z-index:2}
+.mcDiseaseClose{border:0;background:transparent;font-size:26px;cursor:pointer;color:inherit}
+.mcDiseaseBody{padding:18px}.mcDiseaseSearch{width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid rgba(127,127,127,.25);border-radius:12px;background:transparent;color:inherit;margin:8px 0 16px;font:inherit}
+.mcDiseaseGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.mcDiseaseCard{border:1px solid rgba(127,127,127,.18);border-radius:14px;padding:14px;background:rgba(127,127,127,.035);cursor:pointer}
+.mcDiseaseCard:hover{background:rgba(127,127,127,.09)}
+.mcDiseaseCard h3{margin:0 0 5px;font-size:16px}.mcDiseaseSystem{font-size:11px;font-weight:800;opacity:.6;text-transform:uppercase;letter-spacing:.05em}.mcDiseaseSummary{font-size:13px;line-height:1.45;opacity:.8}
+.mcDiseaseDetail{border:1px solid rgba(127,127,127,.18);border-radius:14px;padding:16px;margin-top:14px}.mcDiseaseDetail h2{margin-top:0}.mcDiseaseSection{border-top:1px solid rgba(127,127,127,.14);padding:12px 0}.mcDiseaseSection h4{margin:0 0 7px}.mcDiseaseSection li{margin:5px 0;line-height:1.45}
+</style>
+<script>
+(function(){
+  function start(){
+    var side=document.getElementById('medcalcClinicalSidebar'); if(!side||side.dataset.diseaseV3)return;
+    side.dataset.diseaseV3='1';
+    var b=document.createElement('button'); b.type='button'; b.className='mcDiseaseBtn'; b.innerHTML='<span>🧬</span><span>Diseases &amp; Treatment</span><span style="margin-left:auto;opacity:.55">›</span>';
+    var ref=side.querySelector('.mcRefSection'); if(ref) side.insertBefore(b,ref); else side.appendChild(b);
+    function load(cb){if(window.MEDCALC_DISEASES){cb();return;}var sc=document.createElement('script');sc.src='disease-content-v1.js';sc.onload=cb;document.head.appendChild(sc)}
+    function open(){load(function(){
+      var old=document.getElementById('mcDiseaseModal');if(old)old.remove();
+      var m=document.createElement('div');m.id='mcDiseaseModal';m.className='mcDiseaseModal';
+      m.innerHTML='<div class="mcDiseaseWindow"><div class="mcDiseaseHead"><b>Diseases &amp; Treatment</b><button class="mcDiseaseClose">×</button></div><div class="mcDiseaseBody"><p>Evidence-first clinical reference. Verify current local protocols before clinical use.</p><input class="mcDiseaseSearch" placeholder="Search disease, system or treatment..."><div class="mcDiseaseGrid"></div><div class="mcDiseaseDetail" style="display:none"></div></div></div>';
+      document.body.appendChild(m);
+      var grid=m.querySelector('.mcDiseaseGrid'),detail=m.querySelector('.mcDiseaseDetail'),search=m.querySelector('.mcDiseaseSearch');
+      function render(){var q=search.value.toLowerCase().trim();grid.innerHTML=(window.MEDCALC_DISEASES||[]).filter(function(d){return !q||(d.name+' '+d.system+' '+d.summary+' '+JSON.stringify(d.sections)).toLowerCase().includes(q)}).map(function(d){return '<div class="mcDiseaseCard" data-id="'+d.id+'"><div class="mcDiseaseSystem">'+d.system+'</div><h3>'+d.name+'</h3><div class="mcDiseaseSummary">'+d.summary+'</div></div>'}).join('')||'<p>No matching disease.</p>';grid.querySelectorAll('.mcDiseaseCard').forEach(function(c){c.onclick=function(){show(c.dataset.id)}})}
+      function show(id){var d=(window.MEDCALC_DISEASES||[]).find(function(x){return x.id===id});if(!d)return;detail.style.display='block';detail.innerHTML='<h2>'+d.name+'</h2><p>'+d.summary+'</p>'+Object.keys(d.sections||{}).map(function(k){return '<div class="mcDiseaseSection"><h4>'+k+'</h4><ul>'+d.sections[k].map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div>'}).join('')+'<p><b>References:</b> '+(d.refs||[]).join(' • ')+'</p>';detail.scrollIntoView({behavior:'smooth',block:'start'})}
+      search.oninput=render;render();m.querySelector('.mcDiseaseClose').onclick=function(){m.remove()};m.onclick=function(e){if(e.target===m)m.remove()};
+    })}
+    b.onclick=open;
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();setTimeout(start,800);setTimeout(start,2000);
+})();
+</script>
+
 </body>
 </html>
