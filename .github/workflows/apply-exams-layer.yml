@@ -1,15 +1,13 @@
 name: Apply Detailed Examination Layer
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   apply:
-    if: ${{ !contains(github.event.head_commit.message, 'Apply rebuilt clinical layer') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
