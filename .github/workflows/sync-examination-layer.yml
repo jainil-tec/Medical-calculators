@@ -1,0 +1,35 @@
+name: Sync Examination Layer
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: ${{ !contains(github.event.head_commit.message, 'Sync examination layer') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build clinical content with current examination diagrams
+        run: |
+          cp clinical-content-v2-base.js clinical-content-v1.js
+          printf '\n' >> clinical-content-v1.js
+          cat examination-content-v3.js >> clinical-content-v1.js
+          printf '\n' >> clinical-content-v1.js
+          cat examination-media-v1.js >> clinical-content-v1.js
+      - name: Commit synced clinical content
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add clinical-content-v1.js
+          if git diff --cached --quiet; then
+            echo 'No clinical content changes required.'
+            exit 0
+          fi
+          git commit -m 'Sync examination layer'
+          git push
