@@ -1,0 +1,34 @@
+name: Integrate MedCalc clinical content
+
+on:
+  push:
+    paths:
+      - 'clinical-content-v1.js'
+      - '.github/workflows/integrate-clinical-content.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Integrate content into MedCalc
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='MEDCALC_CLINICAL_CONTENT_V1'
+          if marker not in s:
+              integration='''\n<!-- MEDCALC_CLINICAL_CONTENT_V1 -->\n<script src="clinical-content-v1.js"></script>\n<style id="MEDCALC_CLINICAL_CONTENT_STYLE">\n.medcalcClinicalHub{padding:24px;max-width:1200px;margin:auto}.medcalcClinicalHub h2{margin:0 0 6px}.medcalcClinicalSearch{width:100%;padding:12px 14px;border:1px solid #d9dee8;border-radius:12px;font-size:15px;margin:14px 0 20px}.medcalcClinicalGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}.medcalcClinicalCard{border:1px solid #e5e7eb;border-radius:16px;padding:16px;background:var(--card,#fff);box-shadow:0 4px 16px rgba(0,0,0,.05)}.medcalcClinicalCard h3{margin:0 0 10px;font-size:17px}.medcalcClinicalCard p{margin:6px 0;line-height:1.5}.medcalcClinicalTag{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;margin:2px}.medcalcClinicalEmpty{padding:30px;text-align:center;opacity:.7}.medcalcExamSteps{padding-left:20px}.medcalcExamSteps li{margin:8px 0;line-height:1.5}\n</style>\n<script id="MEDCALC_CLINICAL_CONTENT_JS">\n(function(){\n  function text(v){return String(v??'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\\"':'&quot;',"'":'&#39;'}[c]})}\n  function render(){\n    var root=document.querySelector('[data-medcalc-clinical-content]');\n    if(!root||!window.MEDCALC_CLINICAL_CONTENT)return;\n    var q=(root.querySelector('.medcalcClinicalSearch')?.value||'').toLowerCase().trim();\n    var type=root.getAttribute('data-clinical-type')||'normalValues';\n    var data=window.MEDCALC_CLINICAL_CONTENT[type];\n    if(!data)return;\n    var html='<h2>'+text(data.title)+'</h2><p>'+text(data.intro)+'</p><input class="medcalcClinicalSearch" placeholder="Search this section..." value="'+text(q)+'"><div class="medcalcClinicalGrid">';\n    var count=0;\n    data.groups.forEach(function(g){\n      var items=g.items.filter(function(it){return !q || JSON.stringify(it).toLowerCase().includes(q)||g.name.toLowerCase().includes(q)});\n      if(!items.length)return; count++;\n      html+='<div class="medcalcClinicalCard"><h3>'+text(g.name)+'</h3>';\n      if(type==='examinations'){html+='<ol class="medcalcExamSteps">'+items.map(function(x){return '<li>'+text(x)+'</li>'}).join('')+'</ol>';}\n      else if(type==='normalValues'){html+='<div>'+items.map(function(x){return '<p><strong>'+text(x[0])+'</strong><br>'+text(x[1])+'</p>'}).join('')+'</div>';}\n      else {html+=items.map(function(x){return '<p><strong>'+text(x[0])+'</strong><br><span class="medcalcClinicalTag">'+text(x[1])+'</span><br>'+text(x[2])+'<br><b>Important:</b> '+text(x[3])+'<br><b>Monitor:</b> '+text(x[4])+'</p>'}).join('');}\n      html+='</div>';\n    });\n    html+='</div>';\n    if(!count)html+='<div class="medcalcClinicalEmpty">No matching content found.</div>';\n    root.innerHTML=html;\n    root.querySelector('.medcalcClinicalSearch').addEventListener('input',render);\n  }\n  window.MedCalcRenderClinical=function(type,root){if(root){root.setAttribute('data-medcalc-clinical-content','');root.setAttribute('data-clinical-type',type);render.call(root)} };\n  window.MedCalcClinicalOpen=function(type){\n    var existing=document.getElementById('medcalcClinicalModal');\n    if(existing)existing.remove();\n    var m=document.createElement('div');m.id='medcalcClinicalModal';m.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:12px';\n    m.innerHTML='<div style="background:var(--bg,#fff);color:var(--text,#111);width:min(1100px,100%);height:min(92vh,900px);border-radius:22px;overflow:hidden;display:flex;flex-direction:column"><div style="padding:14px 18px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center"><b>MedCalc Clinical Reference</b><button id="medcalcClinicalClose" style="font-size:22px;border:0;background:none">×</button></div><div data-medcalc-clinical-content data-clinical-type="'+text(type)+'" style="overflow:auto;flex:1;min-height:0"></div></div>';\n    document.body.appendChild(m);render();\n    m.querySelector('#medcalcClinicalClose').onclick=function(){m.remove()};\n    m.addEventListener('click',function(e){if(e.target===m)m.remove()});\n  };\n})();\n</script>\n'''
+              s=s.replace('</body>',integration+'</body>')
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit integration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then echo 'No changes'; else git commit -m 'Integrate clinical reference sections'; git push; fi
