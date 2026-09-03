@@ -1841,6 +1841,133 @@ body.dark #v23Ref .v23Panel{background:#111827;color:#f8fafc}
 })();
 </script>
 
-\n<style id="MEDCALC_V23_SCROLL_FIX">\n/* Mobile/desktop modal scrolling fix */\n#v23Ref{\n  overflow:hidden !important;\n  overscroll-behavior:contain;\n  touch-action:none;\n}\n#v23Ref .v23Panel{\n  height:min(94dvh,920px) !important;\n  max-height:calc(100dvh - 24px) !important;\n  overflow:hidden !important;\n}\n#v23Ref .v23Body{\n  display:flex !important;\n  flex:1 1 auto !important;\n  min-height:0 !important;\n  overflow:hidden !important;\n}\n#v23Ref .v23Nav{\n  flex:0 0 auto !important;\n  min-height:0 !important;\n  overscroll-behavior:contain;\n  touch-action:pan-x;\n}\n#v23Ref .v23Content{\n  flex:1 1 auto !important;\n  min-height:0 !important;\n  min-width:0 !important;\n  overflow-y:auto !important;\n  overflow-x:hidden !important;\n  -webkit-overflow-scrolling:touch !important;\n  overscroll-behavior-y:contain !important;\n  touch-action:pan-y !important;\n  scrollbar-width:thin;\n}\n#v23Ref .v23Section{padding-bottom:24px}\n@media(max-width:700px){\n  #v23Ref{padding:8px !important}\n  #v23Ref .v23Panel{\n    width:100% !important;\n    height:calc(100dvh - 16px) !important;\n    max-height:none !important;\n    border-radius:24px !important;\n  }\n  #v23Ref .v23Body{\n    display:flex !important;\n    flex-direction:column !important;\n  }\n  #v23Ref .v23Nav{\n    width:100% !important;\n    border-right:0 !important;\n    border-bottom:1px solid #e5e7eb !important;\n    display:flex !important;\n    flex:0 0 auto !important;\n    overflow-x:auto !important;\n    overflow-y:hidden !important;\n    -webkit-overflow-scrolling:touch !important;\n    touch-action:pan-x !important;\n    padding:10px !important;\n  }\n  #v23Ref .v23Nav button{flex:0 0 auto !important;min-width:max-content !important}\n  #v23Ref .v23Content{\n    display:block !important;\n    flex:1 1 auto !important;\n    width:100% !important;\n    height:auto !important;\n    min-height:0 !important;\n    overflow-y:auto !important;\n    overflow-x:hidden !important;\n    -webkit-overflow-scrolling:touch !important;\n    touch-action:pan-y !important;\n    padding:18px 14px 40px !important;\n  }\n}\n</style>\n<script id="MEDCALC_V23_SCROLL_FIX_JS">\n(()=> {\n  const modal=document.getElementById('v23Ref');\n  const content=document.getElementById('v23Content');\n  if(!modal||!content) return;\n  const stopBody=()=>document.documentElement.classList.add('v23-lock');\n  const unlockBody=()=>document.documentElement.classList.remove('v23-lock');\n  const oldOpen=window.openV23Emergency;\n  window.openV23Emergency=()=>{\n    if(oldOpen) oldOpen();\n    stopBody();\n    requestAnimationFrame(()=>{content.scrollTop=0});\n  };\n  document.getElementById('v23Close')?.addEventListener('click',unlockBody);\n  modal.addEventListener('click',e=>{if(e.target===modal)unlockBody()});\n  document.addEventListener('keydown',e=>{if(e.key==='Escape')unlockBody()});\n})();\n</script>\n<style id="MEDCALC_V23_SCROLL_LOCK">\nhtml.v23-lock,html.v23-lock body{overscroll-behavior:none}\n</style>\n
+\n<style id="MEDCALC_V23_SCROLL_FIX">
+/* Mobile/desktop modal scrolling fix */
+#v23Ref{
+  overflow:hidden !important;
+  overscroll-behavior:contain;
+  touch-action:none;
+}
+#v23Ref .v23Panel{
+  height:min(94dvh,920px) !important;
+  max-height:calc(100dvh - 24px) !important;
+  overflow:hidden !important;
+}
+#v23Ref .v23Body{
+  display:flex !important;
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#v23Ref .v23Nav{
+  flex:0 0 auto !important;
+  min-height:0 !important;
+  overscroll-behavior:contain;
+  touch-action:pan-x;
+}
+#v23Ref .v23Content{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  min-width:0 !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
+  overscroll-behavior-y:contain !important;
+  touch-action:pan-y !important;
+  scrollbar-width:thin;
+}
+#v23Ref .v23Section{padding-bottom:24px}
+@media(max-width:700px){
+  #v23Ref{padding:8px !important}
+  #v23Ref .v23Panel{
+    width:100% !important;
+    height:calc(100dvh - 16px) !important;
+    max-height:none !important;
+    border-radius:24px !important;
+  }
+  #v23Ref .v23Body{
+    display:flex !important;
+    flex-direction:column !important;
+  }
+  #v23Ref .v23Nav{
+    width:100% !important;
+    border-right:0 !important;
+    border-bottom:1px solid #e5e7eb !important;
+    display:flex !important;
+    flex:0 0 auto !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    touch-action:pan-x !important;
+    padding:10px !important;
+  }
+  #v23Ref .v23Nav button{flex:0 0 auto !important;min-width:max-content !important}
+  #v23Ref .v23Content{
+    display:block !important;
+    flex:1 1 auto !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    touch-action:pan-y !important;
+    padding:18px 14px 40px !important;
+  }
+}
+</style>
+<script id="MEDCALC_V23_SCROLL_FIX_JS">
+(()=> {
+  const modal=document.getElementById('v23Ref');
+  const content=document.getElementById('v23Content');
+  if(!modal||!content) return;
+  const stopBody=()=>document.documentElement.classList.add('v23-lock');
+  const unlockBody=()=>document.documentElement.classList.remove('v23-lock');
+  const oldOpen=window.openV23Emergency;
+  window.openV23Emergency=()=>{
+    if(oldOpen) oldOpen();
+    stopBody();
+    requestAnimationFrame(()=>{content.scrollTop=0});
+  };
+  document.getElementById('v23Close')?.addEventListener('click',unlockBody);
+  modal.addEventListener('click',e=>{if(e.target===modal)unlockBody()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')unlockBody()});
+})();
+</script>
+<style id="MEDCALC_V23_SCROLL_LOCK">\nhtml.v23-lock,html.v23-lock body{overscroll-behavior:none}\n</style>\n
+
+<style id="MEDCALC_V23_SCROLL_FINAL">
+html.medcalc-modal-lock, html.medcalc-modal-lock body { overflow: hidden !important; height: 100% !important; }
+#v23Ref { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100dvh !important; max-height: none !important; overflow: hidden !important; }
+#v23Ref .v23Panel { display: flex !important; flex-direction: column !important; height: 100% !important; max-height: 100% !important; overflow: hidden !important; }
+#v23Ref .v23Body { display: flex !important; flex: 1 1 auto !important; min-height: 0 !important; overflow: hidden !important; }
+#v23Ref .v23Content { flex: 1 1 auto !important; min-height: 0 !important; height: auto !important; overflow-y: scroll !important; overflow-x: hidden !important; -webkit-overflow-scrolling: touch !important; touch-action: pan-y !important; overscroll-behavior: contain !important; }
+@media (max-width: 700px) {
+  #v23Ref { padding: 0 !important; }
+  #v23Ref .v23Panel { width: 100% !important; border-radius: 0 !important; }
+  #v23Ref .v23Body { flex-direction: column !important; }
+  #v23Ref .v23Nav { flex: 0 0 auto !important; width: 100% !important; max-height: 92px !important; overflow-x: auto !important; overflow-y: hidden !important; touch-action: pan-x !important; -webkit-overflow-scrolling: touch !important; }
+  #v23Ref .v23Content { flex: 1 1 0 !important; width: 100% !important; min-height: 1px !important; overflow-y: scroll !important; padding-bottom: 64px !important; }
+}
+</style>
+<script id="MEDCALC_V23_SCROLL_FINAL_JS">
+(function(){
+  function lock(){ document.documentElement.classList.add('medcalc-modal-lock'); document.body.classList.add('medcalc-modal-lock'); }
+  function unlock(){ document.documentElement.classList.remove('medcalc-modal-lock'); document.body.classList.remove('medcalc-modal-lock'); }
+  document.addEventListener('click', function(e){
+    var t=e.target.closest && e.target.closest('#v23Ref');
+    if(!t) return;
+    if(t.id==='v23Close' || (t.classList && t.classList.contains('v23Close')) || t.dataset && t.dataset.close==='true') unlock();
+  }, true);
+  var observer=new MutationObserver(function(){
+    var m=document.getElementById('v23Ref');
+    if(m){
+      var visible=getComputedStyle(m).display!=='none' && getComputedStyle(m).visibility!=='hidden';
+      if(visible) lock();
+    }
+  });
+  observer.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['style','class']});
+})();
+</script>
 </body>
 </html>
