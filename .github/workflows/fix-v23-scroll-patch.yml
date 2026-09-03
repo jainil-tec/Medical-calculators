@@ -1,0 +1,42 @@
+name: Repair MedCalc V23 scroll patch
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-v23-scroll-patch.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repair escaped patch and force modal scrolling
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          start=s.find('<style id="MEDCALC_V23_SCROLL_FIX">')
+          end=s.find('<style id="MEDCALC_V23_SCROLL_LOCK">', start)
+          if start!=-1 and end!=-1:
+              # The first patch was written with literal backslash-n sequences.
+              block=s[start:end]
+              block=block.replace('\\n','\n')
+              s=s[:start]+block+s[end:]
+          # Add a robust final override with real newlines. It targets the actual
+          # modal structure and makes the content pane the only vertical scroller.
+          marker='MEDCALC_V23_SCROLL_FINAL'
+          if marker not in s:
+              patch='''\n<style id="MEDCALC_V23_SCROLL_FINAL">\nhtml.medcalc-modal-lock, html.medcalc-modal-lock body { overflow: hidden !important; height: 100% !important; }\n#v23Ref { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100dvh !important; max-height: none !important; overflow: hidden !important; }\n#v23Ref .v23Panel { display: flex !important; flex-direction: column !important; height: 100% !important; max-height: 100% !important; overflow: hidden !important; }\n#v23Ref .v23Body { display: flex !important; flex: 1 1 auto !important; min-height: 0 !important; overflow: hidden !important; }\n#v23Ref .v23Content { flex: 1 1 auto !important; min-height: 0 !important; height: auto !important; overflow-y: scroll !important; overflow-x: hidden !important; -webkit-overflow-scrolling: touch !important; touch-action: pan-y !important; overscroll-behavior: contain !important; }\n@media (max-width: 700px) {\n  #v23Ref { padding: 0 !important; }\n  #v23Ref .v23Panel { width: 100% !important; border-radius: 0 !important; }\n  #v23Ref .v23Body { flex-direction: column !important; }\n  #v23Ref .v23Nav { flex: 0 0 auto !important; width: 100% !important; max-height: 92px !important; overflow-x: auto !important; overflow-y: hidden !important; touch-action: pan-x !important; -webkit-overflow-scrolling: touch !important; }\n  #v23Ref .v23Content { flex: 1 1 0 !important; width: 100% !important; min-height: 1px !important; overflow-y: scroll !important; padding-bottom: 64px !important; }\n}\n</style>\n<script id="MEDCALC_V23_SCROLL_FINAL_JS">\n(function(){\n  function lock(){ document.documentElement.classList.add('medcalc-modal-lock'); document.body.classList.add('medcalc-modal-lock'); }\n  function unlock(){ document.documentElement.classList.remove('medcalc-modal-lock'); document.body.classList.remove('medcalc-modal-lock'); }\n  document.addEventListener('click', function(e){\n    var t=e.target.closest && e.target.closest('#v23Ref');\n    if(!t) return;\n    if(t.id==='v23Close' || (t.classList && t.classList.contains('v23Close')) || t.dataset && t.dataset.close==='true') unlock();\n  }, true);\n  var observer=new MutationObserver(function(){\n    var m=document.getElementById('v23Ref');\n    if(m){\n      var visible=getComputedStyle(m).display!=='none' && getComputedStyle(m).visibility!=='hidden';\n      if(visible) lock();\n    }\n  });\n  observer.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['style','class']});\n})();\n</script>\n'''
+              s=s.replace('</body>',patch+'</body>')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit repaired patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then echo 'No changes'; else git commit -m 'Repair V23 modal scrolling on mobile'; git push; fi
