@@ -1,0 +1,206 @@
+name: Expand Physical Examinations
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Expand examination content
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('clinical-content-v1.js')
+          s=p.read_text()
+          new = r'''  examinations: {
+    title:'Clinical / Physical Examination',
+    intro:'Revision-friendly bedside examinations. Each system is organized by Inspection, Palpation, Percussion and Auscultation where applicable, with technique, named methods and key findings. Use appropriate consent, privacy, chaperones and clinical judgment.',
+    groups:[
+      {name:'General Examination',items:[
+        'PREPARATION — Wash hands; introduce yourself; confirm identity; explain examination; obtain consent; ensure privacy, adequate exposure, good lighting and a comfortable position.',
+        'INSPECTION — Observe from the end of the bed before touching: general appearance, distress, consciousness, body habitus, nutrition, hydration, posture, gait, skin color and breathing pattern.',
+        'INSPECTION — Look specifically for pallor, icterus, cyanosis, clubbing, lymphadenopathy, edema, dehydration, cachexia, feverish appearance and relevant skin lesions.',
+        'PALPATION — Check pulse rate/rhythm/volume, peripheral temperature, capillary refill, edema, lymph nodes and relevant tenderness or masses.',
+        'PERCUSSION — Not a routine component of the general survey; use it when a focused systemic examination requires it.',
+        'AUSCULTATION — Not a routine component of the general survey; proceed to focused cardiovascular, respiratory or abdominal auscultation as indicated.',
+        'VITALS & SUMMARY — Measure BP, respiratory rate, temperature and SpO₂ when appropriate; record relevant measurements and present the findings systematically.'
+      ]},
+      {name:'Cardiovascular Examination',items:[
+        'PREPARATION — Patient semi-recumbent; expose chest appropriately; examine from the patient’s right side. Assess peripheral signs before the precordium.',
+        'INSPECTION — General appearance, respiratory distress, cyanosis, pallor, edema, xanthomata, clubbing, scars, pacemaker, precordial bulge and visible pulsations.',
+        'PALPATION — Radial pulse: rate, rhythm, volume and character. Compare both sides. Assess radio-radial and radio-femoral delay when indicated.',
+        'PALPATION — Carotid pulse one side at a time; assess volume/character. Palpate apex beat for position, size and character; feel for parasternal heave and thrills.',
+        'PALPATION — Named method: apex beat localization in the 5th intercostal space near the mid-clavicular line; assess for displacement. Use left lateral position to better detect a left ventricular apex when appropriate.',
+        'JVP — Inspect with head elevated about 30–45°. Identify the internal jugular venous pulsation and estimate JVP relative to the sternal angle. Named maneuver: hepatojugular/abdominojugular reflux when indicated.',
+        'PERCUSSION — Rarely required in modern cardiac examination; may be used as a historical/limited method for estimating cardiac borders. Do not substitute it for imaging when accurate cardiac size is required.',
+        'AUSCULTATION — Use diaphragm and bell as appropriate. Listen systematically at aortic, pulmonary, tricuspid and mitral areas; assess S1, S2, splitting, added sounds and murmurs.',
+        'AUSCULTATION — Named positions/maneuvers: left lateral position for low-frequency mitral sounds; sitting forward in expiration for aortic regurgitation; dynamic maneuvers such as Valsalva or handgrip may help characterize selected murmurs.',
+        'AUSCULTATION — If indicated, listen for carotid bruits, abdominal/aortic bruits and femoral bruits; compare findings bilaterally where appropriate.',
+        'SUMMARY — State pulse/BP, JVP, apex, heart sounds, murmurs/added sounds and peripheral signs in a concise clinical presentation.'
+      ]},
+      {name:'Respiratory Examination',items:[
+        'PREPARATION — Patient sitting if possible; expose chest appropriately; compare right and left sides at corresponding levels. Examine anterior, lateral and posterior chest.',
+        'INSPECTION — Respiratory rate, rhythm, depth, pattern, work of breathing, accessory muscles, cyanosis, clubbing, chest shape, scars, deformity and symmetry of expansion.',
+        'INSPECTION — Named patterns/signs: barrel chest, kyphoscoliosis, intercostal recession, paradoxical movement, pursed-lip breathing and use of accessory muscles.',
+        'PALPATION — Tracheal position; chest expansion by placing hands symmetrically on the chest and comparing movement; assess tactile vocal fremitus when indicated.',
+        'PALPATION — Named method: tactile vocal fremitus — ask patient to repeat a phrase while comparing transmitted vibrations symmetrically over corresponding lung fields.',
+        'PERCUSSION — Use indirect percussion: place the middle finger of one hand firmly on the chest and strike its distal phalanx with the middle finger of the other hand. Compare side-to-side from apices to bases.',
+        'PERCUSSION — Identify resonant, dull and hyperresonant notes. Named method: diaphragmatic excursion — percuss downward during quiet breathing, then after deep inspiration, and compare levels.',
+        'AUSCULTATION — Use the diaphragm; compare symmetrical areas. Ask for slow deep breaths through the mouth when appropriate. Listen for intensity, character and symmetry of breath sounds.',
+        'AUSCULTATION — Assess vesicular/bronchial/bronchovesicular sounds and added sounds: crackles, wheeze, rhonchi, pleural rub and stridor where relevant.',
+        'AUSCULTATION — Named vocal-resonance methods: bronchophony, egophony and whispered pectoriloquy; compare corresponding areas when consolidation or other focal pathology is suspected.',
+        'SUMMARY — State respiratory effort, trachea, expansion, percussion note, breath sounds, added sounds and vocal resonance.'
+      ]},
+      {name:'Abdominal Examination',items:[
+        'PREPARATION — Patient supine, head and knees supported, arms by sides; expose from xiphisternum to pubic region while preserving privacy. Ask the patient to identify the most painful area and examine it last.',
+        'REGIONS — Revise the 9 regions: right hypochondrium, epigastric, left hypochondrium; right lumbar, umbilical, left lumbar; right iliac, hypogastric/suprapubic, left iliac. Also know the 4-quadrant division.',
+        'INSPECTION — Contour and symmetry; distension; scars; striae; veins; umbilicus; hernias; masses; visible peristalsis; pulsations; skin changes; movement with respiration.',
+        'INSPECTION — Named signs: Cullen sign (periumbilical bruising), Grey Turner sign (flank bruising), caput medusae and visible abdominal pulsation.',
+        'AUSCULTATION — Perform before percussion/palpation in the traditional abdominal examination sequence. Listen for bowel sounds and assess character; then listen for vascular bruits over the aorta and renal/iliac/femoral arteries when indicated.',
+        'AUSCULTATION — Listen for bruits and friction rubs where clinically relevant. Do not diagnose solely from bowel-sound frequency; interpret with the overall examination.',
+        'PERCUSSION — Percuss all quadrants for tympany/dullness; assess liver span and splenic percussion when indicated.',
+        'PERCUSSION — Named methods: shifting dullness for free intraperitoneal fluid; fluid thrill/fluid wave for marked ascites; splenic percussion methods may support assessment but are not definitive alone.',
+        'PALPATION — Start away from pain. Perform light/superficial palpation for tenderness, guarding and rigidity, then deep palpation for masses and organ enlargement.',
+        'PALPATION — Liver: palpate from right iliac fossa toward the costal margin during inspiration; describe edge, surface, consistency and tenderness. Spleen: palpate diagonally from the right iliac fossa toward the left costal margin; use bimanual technique when needed.',
+        'PALPATION — Kidneys: bimanual ballotment. Aortic pulsation: assess size/expansile character when appropriate. Examine for abdominal masses systematically.',
+        'SPECIAL METHODS — Murphy sign for suspected gallbladder inflammation; McBurney point tenderness; Rovsing sign; psoas sign; obturator sign; Carnett sign when assessing abdominal-wall versus intra-abdominal pain.',
+        'SUMMARY — Present inspection, bowel/vascular sounds, percussion findings, organomegaly, tenderness/masses and relevant special signs.'
+      ]},
+      {name:'CNS Examination',items:[
+        'PREPARATION — Quiet, well-lit room; explain each maneuver. Begin with observation and mental status before detailed neurological testing.',
+        'INSPECTION — Consciousness, behavior, speech, posture, facial symmetry, involuntary movements, tremor, fasciculations, muscle wasting, abnormal gait and use of aids.',
+        'MENTAL STATUS — Assess orientation, attention, memory, language, comprehension, naming, repetition, reading/writing when indicated and higher cortical functions.',
+        'CRANIAL NERVES — CN I when indicated; visual acuity/fields and pupils; ocular movements; facial sensation/movement; hearing; palate/voice; shoulder shrug; tongue movement. Use appropriate named bedside tests.',
+        'PALPATION — Assess muscle bulk and tone; palpate selected peripheral nerves when indicated; assess joint position by moving digits gently when testing proprioception.',
+        'MOTOR — Test power using the MRC scale; assess pronator drift. Examine tone, bulk and involuntary movements. Compare corresponding muscle groups.',
+        'REFLEXES — Elicit biceps, triceps, supinator, knee and ankle jerks; assess plantar response. Compare sides. Named method: reinforcement such as Jendrassik maneuver may assist selected lower-limb reflexes.',
+        'SENSORY — Test light touch, pinprick, temperature, vibration and joint position; then cortical modalities such as stereognosis, graphesthesia, extinction and two-point discrimination when indicated.',
+        'COORDINATION — Finger-nose-finger, heel-shin and rapid alternating movements. Named tests: Romberg test and tandem gait for balance/coordination when safe.',
+        'PERCUSSION/AUSCULTATION — Not routine components of the core neurological examination. Use focused percussion or auscultation only for specific clinical questions or associated systemic findings.',
+        'SUMMARY — Localize the lesion using mental status, cranial nerves, motor, reflex, sensory and coordination findings; state important negatives.'
+      ]},
+      {name:'Musculoskeletal Examination',items:[
+        'PREPARATION — Expose the relevant joint/limb while maintaining privacy; compare both sides and examine adjacent joints above and below when appropriate.',
+        'INSPECTION — Observe posture, gait, alignment, swelling, erythema, deformity, scars, muscle wasting, asymmetry, nodules and skin changes.',
+        'PALPATION — Palpate systematically for warmth, tenderness, swelling, joint-line tenderness, effusion, crepitus and bony landmarks.',
+        'PALPATION — Assess active range of movement first when appropriate, followed by passive range; compare sides and document restriction or pain.',
+        'PERCUSSION — Not a routine component for most joints; targeted percussion may be used for selected bones/conditions when clinically indicated.',
+        'AUSCULTATION — Not routine; listen for crepitus or vascular bruits only when specifically relevant.',
+        'SPECIAL TESTS — Use joint-specific named maneuvers according to the complaint, e.g. Lachman/anterior drawer for knee stability, McMurray for meniscal pathology, Trendelenburg for hip abductor function and Phalen/Tinel for carpal tunnel assessment.',
+        'NEUROVASCULAR — Check distal pulses, capillary refill, sensation and motor function in the affected limb.',
+        'SUMMARY — Describe site, side, inspection, palpation, range of movement, special tests and neurovascular status.'
+      ]},
+      {name:'Thyroid Examination',items:[
+        'PREPARATION — Patient seated, neck exposed from chin to clavicles; inspect from front and side. Explain swallowing maneuvers before performing them.',
+        'INSPECTION — Look for thyroid enlargement, asymmetry, nodules, scars, dilated veins and movement with swallowing. Observe eyes, hands and skin for signs of thyroid dysfunction.',
+        'PALPATION — Stand behind or in front as appropriate; palpate each lobe and isthmus for size, surface, consistency, nodules, tenderness and mobility.',
+        'PALPATION — Named methods: palpation during swallowing; assess tracheal position; assess cervical lymph nodes. Check for retrosternal extension when suspected.',
+        'PERCUSSION — Percussion over the sternum/manubrium may be used as a limited bedside clue to retrosternal extension but is not definitive.',
+        'AUSCULTATION — Use the diaphragm over the thyroid when clinically indicated to detect a bruit suggesting increased vascular flow.',
+        'SPECIAL TESTS — Pemberton sign: raise both arms and observe for facial congestion, cyanosis, dyspnea or venous engorgement suggesting thoracic inlet obstruction. Examine eyes and reflexes when hyperthyroidism is suspected.',
+        'SUMMARY — State thyroid size, surface, consistency, nodules, mobility, bruit, lymph nodes, trachea and relevant systemic signs.'
+      ]},
+      {name:'Obstetric Examination',items:[
+        'PREPARATION — Explain, obtain consent, ensure privacy and position comfortably with slight lateral tilt as appropriate. Ask the patient to empty the bladder when useful for abdominal palpation.',
+        'INSPECTION — General condition, pallor, edema, respiratory distress; abdominal size/shape, scars, striae, linea nigra, fetal movements and visible uterine contractions.',
+        'PALPATION — Measure symphysis-fundal height with a tape from the upper border of the pubic symphysis to the uterine fundus. Interpret with gestational age and local protocol.',
+        'PALPATION — LEOPOLD 1 / FUNDAL GRIP — Place both hands on the fundus to identify the fetal pole occupying the fundus and assess uterine contour.',
+        'PALPATION — LEOPOLD 2 / LATERAL OR UMBILICAL GRIP — Palpate both uterine sides to locate the fetal back versus small parts and determine fetal lie/position.',
+        'PALPATION — LEOPOLD 3 / PAWLIK GRIP — Grasp the presenting part just above the pubic symphysis to identify presentation and assess mobility/engagement.',
+        'PALPATION — LEOPOLD 4 / PELVIC GRIP — Face the patient’s pelvis and palpate the lower uterus to assess the presenting part, flexion and descent.',
+        'PERCUSSION — Not a routine component of modern obstetric examination; percussion may be used only for a specific differential question and should not replace palpation/ultrasound.',
+        'AUSCULTATION — Locate fetal heart sounds over the fetal back using a Pinard fetoscope or Doppler according to gestation and local practice; document rate and regularity.',
+        'SPECIAL METHODS — Assess fetal lie, presentation, position and engagement using Leopold maneuvers. If malpresentation is suspected, confirm with ultrasound where available; Leopold maneuvers are a clinical assessment method, not a substitute for imaging.',
+        'SUMMARY — State gestational age, SFH, lie, presentation, position, engagement, fetal heart rate and relevant maternal findings.'
+      ]},
+      {name:'Gynecological Examination',items:[
+        'PREPARATION — Explain procedure; obtain informed consent; offer appropriate chaperone; provide privacy and draping. Position according to examination and patient comfort.',
+        'INSPECTION — General appearance and abdominal inspection first when indicated. Inspect external genitalia for lesions, discharge, bleeding, swelling, prolapse, atrophy and skin changes.',
+        'PALPATION — Abdominal palpation for tenderness, masses and organ enlargement when relevant. In bimanual examination assess cervical motion tenderness, uterine size/position/mobility and adnexal tenderness or masses.',
+        'PERCUSSION — Not routinely required in the pelvic examination; use abdominal percussion only when a focused abdominal assessment requires it.',
+        'AUSCULTATION — Not routinely required for a standard gynecological examination; use Doppler/fetal heart assessment only when clinically indicated in pregnancy.',
+        'SPECULUM — Insert the lubricated speculum gently with appropriate technique; inspect vaginal walls and cervix. Note color, discharge, bleeding, lesions, ectropion and os appearance; collect indicated samples.',
+        'BIMANUAL — With appropriate lubrication, assess cervix and uterus between fingers and the abdominal hand; describe uterine size, position, mobility and tenderness, then assess adnexa.',
+        'SPECIAL TESTS — Named finding: cervical motion tenderness (Chandelier sign) can support pelvic inflammatory disease in the correct clinical context; interpret with history and other findings.',
+        'SUMMARY — State external findings, vaginal/cervical findings, uterine characteristics, adnexa and tenderness/masses.'
+      ]},
+      {name:'Pediatric Examination',items:[
+        'PREPARATION — Observe the child before touching. Use age-appropriate communication, involve caregiver, maintain warmth and minimize distress. Perform painful maneuvers last when possible.',
+        'INSPECTION — General appearance, interaction, consolability, cry, posture, hydration, nutrition, color, respiratory effort, dysmorphism, skin lesions and growth/body habitus.',
+        'PALPATION — Pulse, capillary refill, hydration, lymph nodes, abdomen, liver/spleen, peripheral temperature and relevant masses/tenderness. Assess fontanelle in infants when appropriate.',
+        'PERCUSSION — Use selectively as part of focused chest/abdominal examination; avoid unnecessary distress.',
+        'AUSCULTATION — Cardiorespiratory examination with appropriate pediatric stethoscope technique; compare breath sounds and assess heart sounds/murmurs. Abdominal bowel sounds when clinically relevant.',
+        'RESPIRATORY — Inspect work of breathing, retractions and nasal flaring; palpate expansion if appropriate; percuss and auscultate systematically when the child cooperates.',
+        'CARDIOVASCULAR — Inspect color/perfusion, palpate pulses, assess precordium, auscultate heart sounds/murmurs and measure BP when appropriate for age.',
+        'ABDOMEN — Inspect, auscultate, percuss and palpate gently; assess liver/spleen and masses. Examine painful areas last.',
+        'DEVELOPMENT — Assess gross motor, fine motor, language and social milestones appropriate to age; measure weight, length/height, head circumference and plot on an appropriate growth chart.',
+        'SUMMARY — Present age, general appearance, vitals/growth, hydration/perfusion, system findings and developmental status.'
+      ]},
+      {name:'Eye Examination',items:[
+        'PREPARATION — Adequate lighting; ask about glasses/contact lenses and relevant symptoms. Examine each eye separately and then together as appropriate.',
+        'INSPECTION — Eyelids, lashes, conjunctiva, sclera, cornea, pupils, iris, ocular alignment, discharge, swelling, proptosis and visible lesions.',
+        'PALPATION — Not routine for the globe. Palpate preauricular nodes and orbital/periocular structures when indicated; do not apply pressure to a suspected open-globe injury.',
+        'PERCUSSION — Not applicable as a routine eye examination technique.',
+        'AUSCULTATION — Not routine. Use objective ocular instruments/tests instead.',
+        'VISUAL ACUITY — Use Snellen or appropriate near-vision chart; test each eye separately with usual correction and document the result.',
+        'VISUAL FIELDS — Confrontation testing: sit opposite the patient and compare peripheral fields; test each eye separately.',
+        'PUPILS — Inspect size/shape and direct/consensual responses; named method: swinging flashlight test for a relative afferent pupillary defect.',
+        'OCULAR MOVEMENTS — Test H-pattern extraocular movements; assess diplopia and nystagmus. Named methods: cover-uncover and alternate-cover tests for ocular alignment; Hirschberg/corneal light reflex when appropriate.',
+        'FUNDOSCOPY — Use an ophthalmoscope in a dim room; assess disc, vessels, macula and retina. Document disc edema, hemorrhage or other abnormalities.',
+        'SUMMARY — State visual acuity, pupils, fields, movements/alignment, anterior segment and fundus findings.'
+      ]},
+      {name:'ENT Examination',items:[
+        'PREPARATION — Good lighting; explain each part. Examine external structures, then use appropriate otoscope/speculum/tongue depressor and hearing tests.',
+        'INSPECTION — Pinnae, external nose, facial symmetry, oral cavity, tongue, teeth, gums, tonsils, posterior pharynx and neck.',
+        'PALPATION — Palpate cervical/submandibular lymph nodes, thyroid when relevant, mastoid tenderness, sinus tenderness and TMJ as indicated.',
+        'PERCUSSION — Percuss frontal/maxillary sinuses only as a limited supportive maneuver when sinus tenderness is suspected; interpret with the clinical picture.',
+        'AUSCULTATION — Not routine for ear/nose/throat examination. Use auscultation selectively for neck bruits or other focused findings.',
+        'EAR — Inspect pinna and canal; otoscopy: gently align canal and inspect tympanic membrane for color, position, landmarks, perforation, fluid or bulging.',
+        'HEARING — Named bedside methods: Rinne test compares air versus bone conduction; Weber test assesses lateralization using a 512-Hz tuning fork where appropriate.',
+        'NOSE — Inspect septum and mucosa with appropriate illumination/speculum; assess discharge, obstruction, polyps or bleeding when present.',
+        'THROAT — Inspect lips, mucosa, teeth, tongue, palate, tonsils and posterior pharynx. Use a tongue depressor gently when needed and assess voice/cranial nerves when indicated.',
+        'SUMMARY — Present ear, hearing, nose, oral cavity, pharynx, lymph-node and neck findings.'
+      ]},
+      {name:'Peripheral Vascular Examination',items:[
+        'PREPARATION — Expose both limbs adequately and compare sides. Position according to arterial or venous question; assess pulses systematically.',
+        'INSPECTION — Skin color, pallor/cyanosis, dependent rubor, ulcers, gangrene, scars, trophic changes, hair loss, swelling, varicosities and asymmetry.',
+        'PALPATION — Temperature, capillary refill, tenderness, edema and peripheral pulses: radial, brachial, carotid as appropriate, femoral, popliteal, posterior tibial and dorsalis pedis.',
+        'PALPATION — Describe pulse rate, rhythm, volume and character; compare sides. Assess for radio-radial/radio-femoral delay when indicated.',
+        'PERCUSSION — Not a routine vascular examination technique. Use focused percussion only when a specific differential diagnosis requires it.',
+        'AUSCULTATION — Listen for arterial bruits over carotid, abdominal/aortic, renal, iliac or femoral vessels when indicated.',
+        'SPECIAL METHODS — Buerger test: elevate the limb and observe for pallor, then place it dependent and observe for reactive hyperemia; interpret with other findings.',
+        'SPECIAL METHODS — Allen test may assess collateral hand circulation before selected arterial procedures; use appropriate technique and interpret in context.',
+        'VENOUS — Assess edema, varicosities, skin pigmentation/induration and tenderness; examine for features of chronic venous disease or acute DVT in the appropriate clinical setting.',
+        'SUMMARY — State arterial pulses, capillary refill, temperature/color, ulcers/trophic changes, bruits and venous findings bilaterally.'
+      ]},
+      {name:'Breast Examination',items:[
+        'PREPARATION — Explain and obtain consent; offer a chaperone; ensure privacy. Examine both breasts and regional lymph nodes. Adapt positioning to symptoms and patient comfort.',
+        'INSPECTION — With arms relaxed, raised, on hips and/or leaning forward as appropriate: symmetry, size, contour, skin changes, dimpling, tethering, nipple position/retraction and visible discharge.',
+        'PALPATION — Use finger pads in a systematic pattern covering the entire breast and tail of Spence; assess a lump for site, size, shape, surface, consistency, mobility and tenderness.',
+        'PALPATION — Named methods/patterns: vertical-strip method, concentric-circle method or wedge/radial method. Choose one systematic pattern and document it consistently.',
+        'PALPATION — Examine axillary, supraclavicular and infraclavicular lymph nodes. Assess nipple discharge only when indicated and avoid unnecessary repeated manipulation.',
+        'PERCUSSION — Not a routine breast-examination technique.',
+        'AUSCULTATION — Not a routine breast-examination technique.',
+        'SUMMARY — State breast symmetry, skin/nipple findings, mass characteristics, discharge and lymph-node findings.'
+      ]}
+    ]
+  }'''
+          pattern=r"\n  examinations: \{.*?\n  \}\n\};"
+          out, n = re.subn(pattern, "\n"+new+"\n};", s, flags=re.S)
+          if n != 1:
+              raise SystemExit(f'Expected one examinations block, found {n}')
+          p.write_text(out)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add clinical-content-v1.js
+          git diff --cached --quiet || git commit -m 'Expand all physical examinations for revision'
+          git push
