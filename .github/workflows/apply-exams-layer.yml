@@ -19,10 +19,14 @@ jobs:
         run: |
           git checkout 032f87e0611afb8a9693f9c2ab055d0c2e79a216 -- clinical-content-v1.js
           cat examination-content-v3.js >> clinical-content-v1.js
-      - name: Commit applied content
+      - name: Commit applied content if changed
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add clinical-content-v1.js
+          if git diff --cached --quiet; then
+            echo 'Clinical examination layer already applied; nothing to commit.'
+            exit 0
+          fi
           git commit -m 'Apply detailed physical examination data'
           git push
