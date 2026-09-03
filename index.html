@@ -2014,5 +2014,66 @@ html.medcalc-modal-lock, html.medcalc-modal-lock body { overflow: hidden !import
   };
 })();
 </script>
+
+<!-- MEDCALC_CLINICAL_REPAIR_V2 -->
+<script src="clinical-content-v1.js"></script>
+<style id="MEDCALC_CLINICAL_REPAIR_STYLE">
+#medcalcClinicalSidebar{margin:12px 10px;padding:10px;border-radius:14px;background:rgba(127,127,127,.08);border:1px solid rgba(127,127,127,.16)}
+#medcalcClinicalSidebar .mcClinicalTitle{font-weight:800;font-size:13px;margin:0 0 7px;opacity:.85}
+#medcalcClinicalSidebar button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;border-radius:9px;padding:8px 9px;margin:2px 0;text-align:left;font:inherit;cursor:pointer}
+#medcalcClinicalSidebar button:hover{background:rgba(127,127,127,.12)}
+#medcalcClinicalModal{position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:12px}
+#medcalcClinicalModal .mcClinicalWindow{background:var(--bg,#fff);color:var(--text,#111);width:min(1100px,100%);height:min(92vh,900px);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+#medcalcClinicalModal .mcClinicalHead{padding:13px 17px;border-bottom:1px solid rgba(127,127,127,.25);display:flex;justify-content:space-between;align-items:center}
+#medcalcClinicalModal .mcClinicalClose{border:0;background:transparent;font-size:24px;cursor:pointer}
+#medcalcClinicalModal .mcClinicalBody{overflow:auto;flex:1;min-height:0;padding:20px}
+.mcClinicalGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.mcClinicalCard{border:1px solid rgba(127,127,127,.2);border-radius:15px;padding:15px;background:var(--card,#fff)}
+.mcClinicalCard h3{margin:0 0 10px;font-size:17px}.mcClinicalCard p{line-height:1.5}.mcClinicalSearch{width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid #cfd5df;border-radius:11px;font:inherit;margin:14px 0 18px}
+@media(max-width:600px){#medcalcClinicalModal{padding:0}#medcalcClinicalModal .mcClinicalWindow{width:100%;height:100%;border-radius:0}#medcalcClinicalModal .mcClinicalBody{padding:14px}.mcClinicalGrid{grid-template-columns:1fr}}
+</style>
+<script id="MEDCALC_CLINICAL_REPAIR_JS">
+(function(){
+  function esc(v){return String(v==null?'':v).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  function render(root,type){
+    var data=window.MEDCALC_CLINICAL_CONTENT&&window.MEDCALC_CLINICAL_CONTENT[type];
+    if(!data||!root)return;
+    var q=(root.querySelector('.mcClinicalSearch')||{}).value||''; q=q.toLowerCase().trim();
+    var html='<h2>'+esc(data.title)+'</h2><p>'+esc(data.intro)+'</p><input class="mcClinicalSearch" placeholder="Search this section..." value="'+esc(q)+'"><div class="mcClinicalGrid">';
+    var count=0;
+    (data.groups||[]).forEach(function(g){
+      var items=(g.items||[]).filter(function(x){return !q||String(g.name).toLowerCase().indexOf(q)>=0||JSON.stringify(x).toLowerCase().indexOf(q)>=0;});
+      if(!items.length)return; count++;
+      html+='<div class="mcClinicalCard"><h3>'+esc(g.name)+'</h3>';
+      if(type==='normalValues') html+=items.map(function(x){return '<p><b>'+esc(x[0])+'</b><br>'+esc(x[1])+'</p>';}).join('');
+      else if(type==='examinations') html+='<ol>'+items.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol>';
+      else html+=items.map(function(x){return '<p><b>'+esc(x[0])+'</b><br>'+esc(x[1])+'<br>'+esc(x[2])+'<br><b>Important:</b> '+esc(x[3])+'<br><b>Monitor:</b> '+esc(x[4])+'</p>';}).join('');
+      html+='</div>';
+    });
+    html+='</div>'; if(!count)html+='<p>No matching content found.</p>'; root.innerHTML=html;
+    var input=root.querySelector('.mcClinicalSearch'); if(input)input.addEventListener('input',function(){render(root,type);});
+  }
+  window.MedCalcClinicalOpen=function(type){
+    var old=document.getElementById('medcalcClinicalModal'); if(old)old.remove();
+    var m=document.createElement('div'); m.id='medcalcClinicalModal';
+    m.innerHTML='<div class="mcClinicalWindow"><div class="mcClinicalHead"><b>MedCalc Clinical Reference</b><button class="mcClinicalClose" type="button">×</button></div><div class="mcClinicalBody"></div></div>';
+    document.body.appendChild(m); render(m.querySelector('.mcClinicalBody'),type);
+    m.querySelector('.mcClinicalClose').onclick=function(){m.remove();};
+    m.addEventListener('click',function(e){if(e.target===m)m.remove();});
+  };
+  function add(){
+    if(document.getElementById('medcalcClinicalSidebar'))return;
+    var host=document.querySelector('aside')||document.querySelector('.sidebar')||document.querySelector('#sidebar')||document.querySelector('[class*="sidebar"]');
+    if(!host)return;
+    var box=document.createElement('div'); box.id='medcalcClinicalSidebar';
+    box.innerHTML='<div class="mcClinicalTitle">🩺 Clinical Reference</div><button type="button" data-mc-clinical="normalValues">🧪 Normal Values</button><button type="button" data-mc-clinical="drugs">💊 Drug Reference</button><button type="button" data-mc-clinical="examinations">🩺 Physical Examination</button>';
+    host.appendChild(box);
+    box.addEventListener('click',function(e){var b=e.target.closest('button[data-mc-clinical]');if(b)window.MedCalcClinicalOpen(b.getAttribute('data-mc-clinical'));});
+  }
+  function start(){add();setTimeout(add,1000);setTimeout(add,3000);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
+</script>
+
 </body>
 </html>
