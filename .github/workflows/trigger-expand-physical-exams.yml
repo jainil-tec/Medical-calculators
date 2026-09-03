@@ -5,15 +5,12 @@ on:
     branches: [main]
 
 permissions:
-  actions: write
   contents: read
 
 jobs:
   dispatch:
-    if: ${{ !contains(github.event.head_commit.message, 'Expand all physical examinations for revision') }}
+    if: ${{ !contains(github.event.head_commit.message, 'Disable broken examination expansion trigger') }}
     runs-on: ubuntu-latest
     steps:
-      - name: Run examination expansion
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run "Expand Physical Examinations" --ref main --repo "${{ github.repository }}"
+      - name: Examination expansion trigger disabled
+        run: echo 'Detailed examination content is maintained directly in the repository.'
