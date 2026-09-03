@@ -1841,132 +1841,133 @@ body.dark #v23Ref .v23Panel{background:#111827;color:#f8fafc}
 })();
 </script>
 
-\n<style id="MEDCALC_V23_SCROLL_FIX">
-/* Mobile/desktop modal scrolling fix */
-#v23Ref{
-  overflow:hidden !important;
-  overscroll-behavior:contain;
-  touch-action:none;
-}
-#v23Ref .v23Panel{
-  height:min(94dvh,920px) !important;
-  max-height:calc(100dvh - 24px) !important;
-  overflow:hidden !important;
-}
-#v23Ref .v23Body{
-  display:flex !important;
-  flex:1 1 auto !important;
-  min-height:0 !important;
-  overflow:hidden !important;
-}
-#v23Ref .v23Nav{
-  flex:0 0 auto !important;
-  min-height:0 !important;
-  overscroll-behavior:contain;
-  touch-action:pan-x;
-}
-#v23Ref .v23Content{
-  flex:1 1 auto !important;
-  min-height:0 !important;
-  min-width:0 !important;
-  overflow-y:auto !important;
-  overflow-x:hidden !important;
-  -webkit-overflow-scrolling:touch !important;
-  overscroll-behavior-y:contain !important;
-  touch-action:pan-y !important;
-  scrollbar-width:thin;
-}
-#v23Ref .v23Section{padding-bottom:24px}
-@media(max-width:700px){
-  #v23Ref{padding:8px !important}
-  #v23Ref .v23Panel{
-    width:100% !important;
-    height:calc(100dvh - 16px) !important;
-    max-height:none !important;
-    border-radius:24px !important;
-  }
-  #v23Ref .v23Body{
-    display:flex !important;
-    flex-direction:column !important;
-  }
-  #v23Ref .v23Nav{
-    width:100% !important;
-    border-right:0 !important;
-    border-bottom:1px solid #e5e7eb !important;
-    display:flex !important;
-    flex:0 0 auto !important;
-    overflow-x:auto !important;
-    overflow-y:hidden !important;
-    -webkit-overflow-scrolling:touch !important;
-    touch-action:pan-x !important;
-    padding:10px !important;
-  }
-  #v23Ref .v23Nav button{flex:0 0 auto !important;min-width:max-content !important}
-  #v23Ref .v23Content{
-    display:block !important;
-    flex:1 1 auto !important;
-    width:100% !important;
-    height:auto !important;
-    min-height:0 !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    -webkit-overflow-scrolling:touch !important;
-    touch-action:pan-y !important;
-    padding:18px 14px 40px !important;
-  }
-}
-</style>
-<script id="MEDCALC_V23_SCROLL_FIX_JS">
-(()=> {
-  const modal=document.getElementById('v23Ref');
-  const content=document.getElementById('v23Content');
-  if(!modal||!content) return;
-  const stopBody=()=>document.documentElement.classList.add('v23-lock');
-  const unlockBody=()=>document.documentElement.classList.remove('v23-lock');
-  const oldOpen=window.openV23Emergency;
-  window.openV23Emergency=()=>{
-    if(oldOpen) oldOpen();
-    stopBody();
-    requestAnimationFrame(()=>{content.scrollTop=0});
-  };
-  document.getElementById('v23Close')?.addEventListener('click',unlockBody);
-  modal.addEventListener('click',e=>{if(e.target===modal)unlockBody()});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')unlockBody()});
-})();
-</script>
-<style id="MEDCALC_V23_SCROLL_LOCK">\nhtml.v23-lock,html.v23-lock body{overscroll-behavior:none}\n</style>\n
+\n\n
+
 
 <style id="MEDCALC_V23_SCROLL_FINAL">
+/* V23 structural scroll fix: modal owns the viewport; content owns vertical scrolling. */
 html.medcalc-modal-lock, html.medcalc-modal-lock body { overflow: hidden !important; height: 100% !important; }
-#v23Ref { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100dvh !important; max-height: none !important; overflow: hidden !important; }
-#v23Ref .v23Panel { display: flex !important; flex-direction: column !important; height: 100% !important; max-height: 100% !important; overflow: hidden !important; }
-#v23Ref .v23Body { display: flex !important; flex: 1 1 auto !important; min-height: 0 !important; overflow: hidden !important; }
-#v23Ref .v23Content { flex: 1 1 auto !important; min-height: 0 !important; height: auto !important; overflow-y: scroll !important; overflow-x: hidden !important; -webkit-overflow-scrolling: touch !important; touch-action: pan-y !important; overscroll-behavior: contain !important; }
+#v23Ref {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-height: none !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+#v23Ref .v23Panel {
+  display: flex !important;
+  flex-direction: column !important;
+  width: min(1200px, 100%) !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+#v23Ref .v23Body {
+  display: flex !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+#v23Ref .v23Content {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  touch-action: pan-y !important;
+}
 @media (max-width: 700px) {
   #v23Ref { padding: 0 !important; }
-  #v23Ref .v23Panel { width: 100% !important; border-radius: 0 !important; }
-  #v23Ref .v23Body { flex-direction: column !important; }
-  #v23Ref .v23Nav { flex: 0 0 auto !important; width: 100% !important; max-height: 92px !important; overflow-x: auto !important; overflow-y: hidden !important; touch-action: pan-x !important; -webkit-overflow-scrolling: touch !important; }
-  #v23Ref .v23Content { flex: 1 1 0 !important; width: 100% !important; min-height: 1px !important; overflow-y: scroll !important; padding-bottom: 64px !important; }
+  #v23Ref .v23Panel {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+  }
+  #v23Ref .v23Body {
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+  #v23Ref .v23Nav {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    max-height: 92px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-x !important;
+  }
+  #v23Ref .v23Content {
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    min-height: 1px !important;
+    height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    padding-bottom: 64px !important;
+  }
 }
 </style>
 <script id="MEDCALC_V23_SCROLL_FINAL_JS">
 (function(){
-  function lock(){ document.documentElement.classList.add('medcalc-modal-lock'); document.body.classList.add('medcalc-modal-lock'); }
-  function unlock(){ document.documentElement.classList.remove('medcalc-modal-lock'); document.body.classList.remove('medcalc-modal-lock'); }
-  document.addEventListener('click', function(e){
-    var t=e.target.closest && e.target.closest('#v23Ref');
-    if(!t) return;
-    if(t.id==='v23Close' || (t.classList && t.classList.contains('v23Close')) || t.dataset && t.dataset.close==='true') unlock();
+  var modal = document.getElementById('v23Ref');
+  if (!modal) return;
+  var savedY = 0;
+  var locked = false;
+  function lockPage(){
+    if (locked) return;
+    locked = true;
+    savedY = window.scrollY || window.pageYOffset || 0;
+    document.documentElement.classList.add('medcalc-modal-lock');
+    document.body.classList.add('medcalc-modal-lock');
+    document.body.style.position = 'fixed';
+    document.body.style.top = (-savedY) + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  }
+  function unlockPage(){
+    if (!locked) return;
+    locked = false;
+    document.documentElement.classList.remove('medcalc-modal-lock');
+    document.body.classList.remove('medcalc-modal-lock');
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    window.scrollTo(0, savedY);
+  }
+  var oldOpen = window.openV23Emergency;
+  if (typeof oldOpen === 'function') {
+    window.openV23Emergency = function(){
+      oldOpen.apply(this, arguments);
+      lockPage();
+      var c = document.getElementById('v23Content');
+      if (c) { c.scrollTop = 0; setTimeout(function(){ c.scrollTop = 0; }, 50); }
+    };
+  }
+  var close = document.getElementById('v23Close');
+  if (close) close.addEventListener('click', unlockPage, true);
+  modal.addEventListener('click', function(e){
+    if (e.target === modal) unlockPage();
   }, true);
-  var observer=new MutationObserver(function(){
-    var m=document.getElementById('v23Ref');
-    if(m){
-      var visible=getComputedStyle(m).display!=='none' && getComputedStyle(m).visibility!=='hidden';
-      if(visible) lock();
-    }
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') unlockPage();
+  }, true);
+  var observer = new MutationObserver(function(){
+    var cs = getComputedStyle(modal);
+    var visible = cs.display !== 'none' && cs.visibility !== 'hidden';
+    if (!visible) unlockPage();
   });
-  observer.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  observer.observe(modal, {attributes:true, attributeFilter:['style','class','hidden']});
 })();
 </script>
 </body>
