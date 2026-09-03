@@ -1,23 +1,23 @@
 /* MedCalc examination media layer.
-   Uses Wikimedia Commons-hosted, openly licensed/public-domain teaching images.
-   Images are shown beside matching named techniques without altering the examination text.
+   Uses openly licensed/public-domain teaching images and diagrams.
+   Images are shown beside matching examination techniques without altering the examination text.
 */
 (function(){
   'use strict';
   const MEDIA = [
     {key:'JVP', match:'JVP —', title:'JVP examination', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Jvp-0007.jpg', credit:'Wikimedia Commons: Jvp-0007.jpg'},
     {key:'APEX', match:'PALPATION — CAROTID PULSE', title:'Precordial / apex examination', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Apex-cardiogram1.JPG', credit:'Wikimedia Commons: Apex-cardiogram1.JPG'},
+    {key:'RESP_EXPANSION', match:'PALPATION — ASSESS TRACHEAL POSITION', title:'Chest expansion technique', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Anterior_Chest_Lines.png', credit:'Meredith Pomietlo / Chippewa Valley Technical College — CC BY 4.0'},
+    {key:'RESP_AUSC', match:'AUSCULTATION — USE THE DIAPHRAGM', title:'Respiratory auscultation areas', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Anterior_Respiratory_Auscultation_Pattern.png', credit:'Meredith Pomietlo / Chippewa Valley Technical College — CC BY 4.0'},
     {key:'LEOPOLD', match:'LEOPOLD 1 / FUNDAL GRIP', title:'Leopold maneuvers', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Handgriffe.JPG', credit:'Wikimedia Commons: Handgriffe.JPG — public domain'},
-    {key:'CHEST', match:'PALPATION METHOD — TACTILE VOCAL FREMITUS', title:'Chest examination technique', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Palpation_of_the_chest.jpg', credit:'Wikimedia Commons teaching media'},
     {key:'LACHMAN', match:'SPECIAL TESTS — EXAMPLES: LACHMAN', title:'Lachman test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/ACLI_17.jpg', credit:'Wikimedia Commons: ACLI 17.jpg — CC BY-SA 2.0'},
     {key:'PHALEN', match:'SPECIAL TESTS — EXAMPLES: LACHMAN', title:'Phalen maneuver', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Phalen_maneuver.jpg', credit:'Wikimedia Commons: Phalen maneuver.jpg — attribution permitted'},
+    {key:'TREND', match:'SPECIAL TESTS — EXAMPLES: LACHMAN', title:'Trendelenburg test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Trendelenburg.PNG', credit:'Wikimedia Commons: Trendelenburg.PNG'},
     {key:'ROMBERG', match:'COORDINATION — FINGER-NOSE-FINGER', title:'Romberg test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/CCG_Romberg-Test.png', credit:'Wikimedia Commons: CCG Romberg-Test.png — CC BY-SA 4.0'},
     {key:'THYROID', match:'PALPATION METHODS — PALPATION DURING SWALLOWING', title:'Thyroid examination', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastman_examining_thyroid_of_Tanna_woman_Vanuatu_2006.jpg', credit:'Wikimedia Commons: Eastman examining thyroid of Tanna woman Vanuatu 2006.jpg — CC BY-SA 4.0'},
     {key:'RINNE', match:'RINNE TEST', title:'Rinne test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Rinneversuch.png', credit:'Wikimedia Commons: Rinneversuch.png'},
     {key:'WEBER', match:'WEBER TEST', title:'Weber test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Weber%20Test.jpg', credit:'Wikimedia Commons: Weber Test.jpg — CC BY-SA 4.0'},
-    {key:'FUNDOSCOPY', match:'FUNDOSCOPY — USE OPHTHALMOSCOPE', title:'Ophthalmoscopy / fundoscopy', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Ophthalmoscopy.JPG', credit:'Wikimedia Commons: Ophthalmoscopy.JPG'},
-    {key:'TREND', match:'SPECIAL TESTS — EXAMPLES: LACHMAN', title:'Trendelenburg test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Trendelenburg.PNG', credit:'Wikimedia Commons: Trendelenburg.PNG'},
-    {key:'BREAST', match:'MOVEMENT — ASSESS ACTIVE RANGE', title:'Clinical examination teaching', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Neurological_tools.jpg', credit:'Wikimedia Commons teaching image'}
+    {key:'FUNDOSCOPY', match:'FUNDOSCOPY — USE OPHTHALMOSCOPE', title:'Ophthalmoscopy / fundoscopy', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Ophthalmoscopy.JPG', credit:'Wikimedia Commons: Ophthalmoscopy.JPG'}
   ];
   function norm(s){return (s||'').replace(/\s+/g,' ').trim().toUpperCase();}
   function addStyles(){
@@ -29,7 +29,7 @@
   function add(el,m){
     if(!el.parentElement || el.parentElement.querySelector(':scope > .medcalc-exam-media[data-media-key="'+m.key+'"]')) return;
     const box=document.createElement('div'); box.className='medcalc-exam-media'; box.dataset.mediaKey=m.key;
-    box.innerHTML='<img loading="lazy" referrerpolicy="no-referrer" src="'+m.src+'" alt="'+m.title+' photograph/diagram"><div class="medcalc-exam-media-copy"><div class="medcalc-exam-media-title">📷 '+m.title+'</div><div class="medcalc-exam-media-credit">Teaching image • '+m.credit+'</div></div>';
+    box.innerHTML='<img loading="lazy" referrerpolicy="no-referrer" src="'+m.src+'" alt="'+m.title+' teaching photograph or diagram"><div class="medcalc-exam-media-copy"><div class="medcalc-exam-media-title">📷 '+m.title+'</div><div class="medcalc-exam-media-credit">Teaching image • '+m.credit+'</div></div>';
     el.insertAdjacentElement('afterend',box);
   }
   function scan(){
