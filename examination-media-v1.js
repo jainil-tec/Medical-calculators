@@ -1,23 +1,26 @@
 /* MedCalc examination media layer.
    Uses openly licensed/public-domain teaching images and diagrams.
-   Images are shown beside matching examination techniques without altering the examination text.
+   Images are inserted beside matching examination techniques without changing the clinical text.
 */
 (function(){
   'use strict';
   const MEDIA = [
     {key:'JVP', match:'JVP —', title:'JVP examination', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Jvp-0007.jpg', credit:'Wikimedia Commons: Jvp-0007.jpg'},
-    {key:'APEX', match:'PALPATION — CAROTID PULSE', title:'Precordial / apex examination', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Apex-cardiogram1.JPG', credit:'Wikimedia Commons: Apex-cardiogram1.JPG'},
-    {key:'RESP_EXPANSION', match:'PALPATION — ASSESS TRACHEAL POSITION', title:'Chest expansion technique', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Anterior_Chest_Lines.png', credit:'Meredith Pomietlo / Chippewa Valley Technical College — CC BY 4.0'},
-    {key:'RESP_AUSC', match:'AUSCULTATION — USE THE DIAPHRAGM', title:'Respiratory auscultation areas', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Anterior_Respiratory_Auscultation_Pattern.png', credit:'Meredith Pomietlo / Chippewa Valley Technical College — CC BY 4.0'},
-    {key:'LEOPOLD', match:'LEOPOLD 1 / FUNDAL GRIP', title:'Leopold maneuvers', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Handgriffe.JPG', credit:'Wikimedia Commons: Handgriffe.JPG — public domain'},
+    {key:'JVP2', match:'JVP —', title:'Elevated JVP example', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Elevated_JVP.JPG', credit:'Wikimedia Commons: Elevated JVP.JPG'},
+    {key:'RESP_AUSC', match:'AUSCULTATION — USE THE DIAPHRAGM', title:'Respiratory auscultation', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Anterior_Respiratory_Auscultation_Pattern.png', credit:'Openly licensed clinical-skills teaching image'},
+    {key:'LEOPOLD1', match:'LEOPOLD 1 / FUNDAL GRIP', title:'Leopold maneuver 1 — fundal grip', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Leopold-Handgriff_1.jpg', credit:'Wikimedia Commons: Leopold-Handgriff 1.jpg — public domain'},
+    {key:'LEOPOLD2', match:'LEOPOLD 2 / LATERAL GRIP', title:'Leopold maneuver 2 — lateral grip', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Leopold-Handgriff_2.jpg', credit:'Wikimedia Commons: Leopold-Handgriff 2.jpg — public domain'},
+    {key:'LEOPOLD3', match:'LEOPOLD 3 / PAWLIK GRIP', title:'Leopold maneuver 3 — Pawlik grip', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Leopold-Handgriff_3.jpg', credit:'Wikimedia Commons: Leopold-Handgriff 3.jpg — public domain'},
+    {key:'LEOPOLD4', match:'LEOPOLD 4 / PELVIC GRIP', title:'Leopold maneuver 4 — pelvic grip', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Leopold-Handgriff_4.jpg', credit:'Wikimedia Commons: Leopold-Handgriff 4.jpg — public domain'},
     {key:'LACHMAN', match:'SPECIAL TESTS — EXAMPLES: LACHMAN', title:'Lachman test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/ACLI_17.jpg', credit:'Wikimedia Commons: ACLI 17.jpg — CC BY-SA 2.0'},
-    {key:'PHALEN', match:'SPECIAL TESTS — EXAMPLES: LACHMAN', title:'Phalen maneuver', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Phalen_maneuver.jpg', credit:'Wikimedia Commons: Phalen maneuver.jpg — attribution permitted'},
-    {key:'TREND', match:'SPECIAL TESTS — EXAMPLES: LACHMAN', title:'Trendelenburg test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Trendelenburg.PNG', credit:'Wikimedia Commons: Trendelenburg.PNG'},
-    {key:'ROMBERG', match:'COORDINATION — FINGER-NOSE-FINGER', title:'Romberg test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/CCG_Romberg-Test.png', credit:'Wikimedia Commons: CCG Romberg-Test.png — CC BY-SA 4.0'},
-    {key:'THYROID', match:'PALPATION METHODS — PALPATION DURING SWALLOWING', title:'Thyroid examination', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastman_examining_thyroid_of_Tanna_woman_Vanuatu_2006.jpg', credit:'Wikimedia Commons: Eastman examining thyroid of Tanna woman Vanuatu 2006.jpg — CC BY-SA 4.0'},
-    {key:'RINNE', match:'RINNE TEST', title:'Rinne test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Rinneversuch.png', credit:'Wikimedia Commons: Rinneversuch.png'},
+    {key:'PHALEN', match:'SPECIAL TESTS — EXAMPLES: LACHMAN', title:'Phalen maneuver', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Phalen_maneuver.jpg', credit:'Wikimedia Commons: Phalen maneuver — attribution permitted'},
+    {key:'TINEL', match:'SPECIAL TESTS — EXAMPLES: LACHMAN', title:"Tinel's sign", src:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Tinel's_sign.jpg", credit:"Wikimedia Commons: Tinel's sign.jpg — CC BY-SA 4.0"},
+    {key:'ROMBERG', match:'COORDINATION — FINGER-NOSE-FINGER', title:'Romberg test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Romberg.jpg', credit:'Wikimedia Commons: Romberg.jpg — CC BY-SA / GFDL'},
+    {key:'THYROID', match:'PALPATION METHODS — PALPATION DURING SWALLOWING', title:'Thyroid examination', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Eastman_examining_thyroid_of_Tanna_woman_Vanuatu_2006.jpg', credit:'Wikimedia Commons: thyroid examination image — CC BY-SA 4.0'},
+    {key:'RINNE', match:'RINNE TEST', title:'Rinne test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Rinneversuch.png', credit:'Wikimedia Commons: Rinneversuch.png — CC0/public domain'},
     {key:'WEBER', match:'WEBER TEST', title:'Weber test', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Weber%20Test.jpg', credit:'Wikimedia Commons: Weber Test.jpg — CC BY-SA 4.0'},
-    {key:'FUNDOSCOPY', match:'FUNDOSCOPY — USE OPHTHALMOSCOPE', title:'Ophthalmoscopy / fundoscopy', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Ophthalmoscopy.JPG', credit:'Wikimedia Commons: Ophthalmoscopy.JPG'}
+    {key:'FUNDOSCOPY', match:'FUNDOSCOPY — USE OPHTHALMOSCOPE', title:'Ophthalmoscopy / fundoscopy', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Ophthalmoscopy.JPG', credit:'Wikimedia Commons: Ophthalmoscopy.JPG — public domain / NIH'},
+    {key:'FUNDOSCOPY2', match:'FUNDOSCOPY — USE OPHTHALMOSCOPE', title:'Fundoscopy reference', src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/202306_Fundoscopy_Male.svg', credit:'Wikimedia Commons: DBCLS fundoscopy illustration — CC BY 4.0'}
   ];
   function norm(s){return (s||'').replace(/\s+/g,' ').trim().toUpperCase();}
   function addStyles(){
@@ -38,7 +41,7 @@
     MEDIA.forEach(m=>candidates.forEach(el=>{
       const t=norm(el.textContent); if(!t || t.length>500) return;
       if(t.indexOf(m.match)<0) return;
-      if(m.key==='JVP' && !t.startsWith('JVP —')) return;
+      if(m.key.startsWith('JVP') && !t.startsWith('JVP —')) return;
       add(el,m);
     }));
   }
