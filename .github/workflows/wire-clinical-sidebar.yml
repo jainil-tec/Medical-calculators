@@ -1,0 +1,66 @@
+name: Wire MedCalc Clinical Sidebar
+
+on:
+  push:
+    paths:
+      - '.github/workflows/wire-clinical-sidebar.yml'
+      - 'clinical-content-v1.js'
+  workflow_dispatch:
+
+jobs:
+  wire:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inject clinical sidebar launcher
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = 'MEDCALC_CLINICAL_SIDEBAR_V1'
+          if marker not in s:
+              block = r'''
+<!-- MEDCALC_CLINICAL_SIDEBAR_V1 -->
+<style id="MEDCALC_CLINICAL_SIDEBAR_STYLE">
+#medcalcClinicalSidebar{margin:14px 10px;padding:12px;border-radius:16px;background:rgba(127,127,127,.08);border:1px solid rgba(127,127,127,.16)}
+#medcalcClinicalSidebar .mcClinicalTitle{font-weight:800;font-size:13px;margin:0 0 8px;opacity:.85}
+#medcalcClinicalSidebar button{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;border-radius:10px;padding:9px 10px;margin:2px 0;text-align:left;font:inherit;cursor:pointer}
+#medcalcClinicalSidebar button:hover{background:rgba(127,127,127,.12)}
+</style>
+<script id="MEDCALC_CLINICAL_SIDEBAR_JS">
+(function(){
+  function addClinicalSidebar(){
+    if(document.getElementById('medcalcClinicalSidebar')) return;
+    var host=document.querySelector('aside')||document.querySelector('.sidebar')||document.querySelector('#sidebar')||document.querySelector('[class*="sidebar"]');
+    if(!host) return;
+    var box=document.createElement('div'); box.id='medcalcClinicalSidebar';
+    box.innerHTML='<div class="mcClinicalTitle">🩺 Clinical Reference</div>'+
+      '<button type="button" data-mc-clinical="normalValues">🧪 <span>Normal Values</span></button>'+
+      '<button type="button" data-mc-clinical="drugs">💊 <span>Drug Reference</span></button>'+
+      '<button type="button" data-mc-clinical="examinations">🩺 <span>Clinical / Physical Examination</span></button>';
+    host.appendChild(box);
+    box.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-mc-clinical]');
+      if(b && window.MedCalcClinicalOpen) window.MedCalcClinicalOpen(b.getAttribute('data-mc-clinical'));
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',addClinicalSidebar); else addClinicalSidebar();
+  var mo=new MutationObserver(addClinicalSidebar); mo.observe(document.documentElement,{childList:true,subtree:true});
+  setTimeout(addClinicalSidebar,1500); setTimeout(addClinicalSidebar,4000);
+})();
+</script>
+'''
+              s=s.replace('</body>', block+'\n</body>') if '</body>' in s else s+block
+              p.write_text(s,encoding='utf-8')
+          else:
+              print('Clinical sidebar already present')
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Add clinical reference tools to sidebar'
+          git push
