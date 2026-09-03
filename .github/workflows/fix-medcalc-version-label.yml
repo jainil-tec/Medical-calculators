@@ -1,0 +1,44 @@
+name: Fix MedCalc version label
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-medcalc-version-label.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace stale V19 labels
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = s
+          replacements = {
+              'MedCalc V19':'MedCalc',
+              'MEDCALC V19':'MEDCALC',
+              'V19 • Medical Calculators':'Medical Calculators',
+              'V19 - Medical Calculators':'Medical Calculators',
+              'V19 | Medical Calculators':'Medical Calculators',
+          }
+          for a,b in replacements.items():
+              s = s.replace(a,b)
+          marker = 'MEDCALC_VERSION_LABEL_FIX_V1'
+          if marker not in s:
+              s += f'''\n<!-- {marker} -->\n<style>\n.medcalc-version-badge{{font-size:0!important}}\n.medcalc-version-badge::after{{content:'MedCalc';font-size:inherit}}\n</style>\n<script>(function(){var r=/\\bV19\\b/g;function f(){document.querySelectorAll('body *').forEach(function(e){if(e.children.length===0&&e.textContent.trim()==='V19')e.textContent='MedCalc';});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',f);else f();})();</script>\n'''
+          if s != old:
+              p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Remove stale V19 sidebar label'
+          git push
