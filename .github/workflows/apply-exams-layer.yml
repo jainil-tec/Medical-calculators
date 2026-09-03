@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   apply:
-    if: ${{ !contains(github.event.head_commit.message, 'Rebuild clinical examination layer') }}
+    if: ${{ !contains(github.event.head_commit.message, 'Apply rebuilt clinical layer') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,5 +31,5 @@ jobs:
             echo 'Clinical layer already matches current source files.'
             exit 0
           fi
-          git commit -m 'Rebuild clinical examination layer'
+          git commit -m 'Apply rebuilt clinical layer'
           git push
