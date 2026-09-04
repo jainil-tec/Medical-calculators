@@ -1,0 +1,48 @@
+name: Enable MedCalc Auto Update
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  enable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Inject auto-update and version marker
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os, re, subprocess
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script src="auto-update-v1.js"></script>'
+          if tag not in s:
+              marker='</head>' if '</head>' in s else '</body>'
+              if marker not in s:
+                  raise SystemExit('No HTML insertion point found')
+              s=s.replace(marker,tag+'\n'+marker,1)
+          version=os.environ['GITHUB_SHA']
+          meta='<meta name="medcalc-version" content="'+version+'">'
+          pattern=r'<meta\s+name=["\']medcalc-version["\'][^>]*>'
+          if re.search(pattern,s,re.I):
+              s=re.sub(pattern,meta,s,count=1,flags=re.I)
+          else:
+              marker='</head>' if '</head>' in s else '</body>'
+              s=s.replace(marker,meta+'\n'+marker,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then echo 'Auto-update already enabled'; else git commit -m 'Enable automatic MedCalc updates'; git push; fi
