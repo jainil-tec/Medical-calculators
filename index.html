@@ -2170,7 +2170,7 @@ html.medcalc-modal-lock, html.medcalc-modal-lock body { overflow: hidden !import
     side.dataset.diseaseV3='1';
     var b=document.createElement('button'); b.type='button'; b.className='mcDiseaseBtn'; b.innerHTML='<span>🧬</span><span>Diseases &amp; Treatment</span><span style="margin-left:auto;opacity:.55">›</span>';
     var ref=side.querySelector('.mcRefSection'); if(ref) side.insertBefore(b,ref); else side.appendChild(b);
-    function load(cb){if(window.MEDCALC_DISEASES){cb();return;}var sc=document.createElement('script');sc.src='disease-content-v1.js';sc.onload=cb;document.head.appendChild(sc)}
+    function load(cb){function add(){var sc2=document.createElement('script');sc2.src='disease-content-v2-additions.js';sc2.onload=cb;document.head.appendChild(sc2)}if(window.MEDCALC_DISEASES){add();return;}var sc=document.createElement('script');sc.src='disease-content-v1.js';sc.onload=add;document.head.appendChild(sc)}
     function open(){load(function(){
       var old=document.getElementById('mcDiseaseModal');if(old)old.remove();
       var m=document.createElement('div');m.id='mcDiseaseModal';m.className='mcDiseaseModal';
