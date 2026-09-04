@@ -2187,5 +2187,49 @@ html.medcalc-modal-lock, html.medcalc-modal-lock body { overflow: hidden !import
 })();
 </script>
 
+<!-- MEDCALC_DISEASE_SUMMARY_CARD_V1 -->
+<style>
+.mcDiseaseSummaryCardV1{position:relative}
+.mcDiseaseSummaryCardV1 .mcDiseaseDescV1{font-size:13px;line-height:1.35;opacity:.72;margin-top:4px}
+.mcDiseaseSummaryCardV1 .mcDiseaseArrowV1{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:28px;opacity:.72}
+</style>
+<script>
+(function(){
+  function patch(){
+    var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+    var free=null,noReg=null,n;
+    while(n=walker.nextNode()){
+      var t=n.nodeValue.trim();
+      if(t==='Free' && !free) free=n;
+      if(t==='No registration' && !noReg) noReg=n;
+    }
+    if(!free || !noReg) return false;
+    var card=free.parentElement;
+    for(var i=0;i<6 && card;i++,card=card.parentElement){
+      if(card.textContent.indexOf('Free')>=0 && card.textContent.indexOf('No registration')>=0) break;
+    }
+    if(!card) return false;
+    card.classList.add('mcDiseaseSummaryCardV1');
+    free.nodeValue='30+';
+    noReg.nodeValue='Diseases & Treatment';
+    if(!card.querySelector('.mcDiseaseDescV1')){
+      var d=document.createElement('div');
+      d.className='mcDiseaseDescV1';
+      d.textContent='Clinical features • Diagnosis • Investigations • Treatment';
+      noReg.parentElement.appendChild(d);
+    }
+    if(!card.querySelector('.mcDiseaseArrowV1')){
+      var a=document.createElement('span');
+      a.className='mcDiseaseArrowV1';
+      a.textContent='›';
+      card.appendChild(a);
+    }
+    return true;
+  }
+  function run(){if(patch())return;var tries=0,t=setInterval(function(){if(patch()||++tries>30)clearInterval(t)},250)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+})();
+</script>
+
 </body>
 </html>
