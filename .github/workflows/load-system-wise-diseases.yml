@@ -1,0 +1,59 @@
+name: Load System-wise Disease Navigation
+
+on:
+  push:
+    paths:
+      - 'disease-system-organizer.js'
+      - '.github/workflows/load-system-wise-diseases.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  load-system-navigation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Sync with latest main
+        run: git fetch origin main && git reset --hard origin/main
+      - name: Inject system-wise navigation loader
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tags=[
+            '<script src="sidebar-ui-fix.js"></script>',
+            '<script src="disease-system-organizer.js"></script>'
+          ]
+          for tag in tags:
+              if tag not in s:
+                  if '</body>' in s:
+                      s=s.replace('</body>', tag+'\n</body>', 1)
+                  elif '</head>' in s:
+                      s=s.replace('</head>', tag+'</head>', 1)
+                  else:
+                      s += '\n'+tag+'\n'
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit homepage loader
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'System-wise navigation loaders already present'
+            exit 0
+          fi
+          git commit -m 'Load system-wise disease navigation'
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main && git push origin HEAD:main && exit 0
+            git rebase --abort || true
+          done
+          echo 'Failed to push after retries'
+          exit 1
