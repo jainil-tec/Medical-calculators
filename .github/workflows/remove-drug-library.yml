@@ -1,0 +1,46 @@
+name: Remove Legacy Drug Library
+
+on:
+  push:
+    paths:
+      - 'remove-drug-reference.js'
+      - '.github/workflows/remove-drug-library.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  remove-drugs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add drug removal layer to homepage
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          tag = '<script src="remove-drug-reference.js"></script>'
+          if tag not in s:
+              marker = '</body>'
+              if marker in s:
+                  s = s.replace(marker, tag + '\n' + marker, 1)
+              else:
+                  s += '\n' + tag + '\n'
+              p.write_text(s, encoding='utf-8')
+              print('Added legacy drug removal layer')
+          else:
+              print('Drug removal layer already present')
+          PY
+      - name: Commit homepage change
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No homepage change required'
+          else
+            git commit -m 'Remove legacy 57 plus drug library from website'
+            git push
+          fi
