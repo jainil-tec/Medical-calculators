@@ -15,6 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Sync with latest main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
       - name: Inject disease reference loader
         run: |
           python - <<'PY'
@@ -38,5 +44,19 @@ jobs:
             echo 'No homepage change required'
           else
             git commit -m 'Load disease reference v7'
-            git push
+            for i in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase origin/main && git push && exit 0
+              git rebase --abort || true
+              git reset --hard origin/main
+              python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text(encoding='utf-8'); tag='<script src="disease-content-v7-additions.js"></script>'
+          if tag not in s:
+              s=s.replace('</head>',tag+'</head>',1) if '</head>' in s else s+'\n'+tag+'\n'
+              p.write_text(s,encoding='utf-8')
+          PY
+              git add index.html && git commit -m 'Load disease reference v7' || true
+            done
+            exit 1
           fi
