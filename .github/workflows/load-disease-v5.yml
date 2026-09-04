@@ -15,23 +15,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Add v5 disease loader
+      - name: Add reliable v5 disease script tag
         run: |
           python - <<'PY'
           from pathlib import Path
-          p=Path('index.html')
-          s=p.read_text(encoding='utf-8')
-          old="sc4.src='disease-content-v4-additions.js';sc4.onload=cb;document.head.appendChild(sc4)"
-          new="sc4.src='disease-content-v4-additions.js';sc4.onload=function(){var sc5=document.createElement('script');sc5.src='disease-content-v5-additions.js';sc5.onload=cb;document.head.appendChild(sc5)};document.head.appendChild(sc4)"
-          if old in s:
-              s=s.replace(old,new,1)
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          tag = '<script src="disease-content-v5-additions.js"></script>'
+          if tag not in s:
+              marker = '</head>'
+              if marker in s:
+                  s = s.replace(marker, tag + marker, 1)
+              else:
+                  s += '\n' + tag + '\n'
+              p.write_text(s, encoding='utf-8')
+              print('Added v5 disease script tag')
           else:
-              print('v5 loader already present or expected loader not found')
-          p.write_text(s,encoding='utf-8')
+              print('v5 disease script tag already present')
           PY
-      - name: Commit
+      - name: Commit homepage change
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          if git diff --cached --quiet; then echo 'No changes'; else git commit -m 'Load v5 disease reference modules'; git push; fi
+          if git diff --cached --quiet; then
+            echo 'No homepage change required'
+          else
+            git commit -m 'Load all v5 disease modules on homepage'
+            git push
+          fi
