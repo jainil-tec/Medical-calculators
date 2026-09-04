@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'disease-content-v1.js'
+      - 'disease-content-v2-additions.js'
       - '.github/workflows/integrate-disease-hub.yml'
   workflow_dispatch:
 
@@ -22,7 +23,13 @@ jobs:
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
           if 'MEDCALC_DISEASE_HUB_V3' in s:
-              print('Disease hub already integrated')
+              old="function load(cb){if(window.MEDCALC_DISEASES){cb();return;}var sc=document.createElement('script');sc.src='disease-content-v1.js';sc.onload=cb;document.head.appendChild(sc)}"
+              new="function load(cb){function add(){var sc2=document.createElement('script');sc2.src='disease-content-v2-additions.js';sc2.onload=cb;document.head.appendChild(sc2)}if(window.MEDCALC_DISEASES){add();return;}var sc=document.createElement('script');sc.src='disease-content-v1.js';sc.onload=add;document.head.appendChild(sc)}"
+              if old in s:
+                  s=s.replace(old,new,1)
+                  p.write_text(s,encoding='utf-8')
+              else:
+                  print('Disease hub already has expanded loader')
               raise SystemExit(0)
           block=r'''
           <!-- MEDCALC_DISEASE_HUB_V3 -->
@@ -47,7 +54,7 @@ jobs:
               side.dataset.diseaseV3='1';
               var b=document.createElement('button'); b.type='button'; b.className='mcDiseaseBtn'; b.innerHTML='<span>🧬</span><span>Diseases &amp; Treatment</span><span style="margin-left:auto;opacity:.55">›</span>';
               var ref=side.querySelector('.mcRefSection'); if(ref) side.insertBefore(b,ref); else side.appendChild(b);
-              function load(cb){if(window.MEDCALC_DISEASES){cb();return;}var sc=document.createElement('script');sc.src='disease-content-v1.js';sc.onload=cb;document.head.appendChild(sc)}
+              function load(cb){function add(){var sc2=document.createElement('script');sc2.src='disease-content-v2-additions.js';sc2.onload=cb;document.head.appendChild(sc2)}if(window.MEDCALC_DISEASES){add();return;}var sc=document.createElement('script');sc.src='disease-content-v1.js';sc.onload=add;document.head.appendChild(sc)}
               function open(){load(function(){
                 var old=document.getElementById('mcDiseaseModal');if(old)old.remove();
                 var m=document.createElement('div');m.id='mcDiseaseModal';m.className='mcDiseaseModal';
@@ -73,4 +80,4 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          if git diff --cached --quiet; then echo 'No changes'; else git commit -m 'Add visible Diseases and Treatment hub'; git push; fi
+          if git diff --cached --quiet; then echo 'No changes'; else git commit -m 'Load expanded disease reference modules'; git push; fi
