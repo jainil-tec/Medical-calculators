@@ -20,17 +20,12 @@
       var el=all[i];
       var text=(el.textContent||'').trim();
       if(!text || text.length>100) continue;
-
-      /* Hide individual drug cards/names in the sidebar. The drug cards use the
-         pill emoji, while category headers use different icons. */
       if(/^💊\s*/.test(text) && text.length<=70){
         el.classList.add('medcalc-drug-name-hidden');
         if(el.parentElement && (el.parentElement.textContent||'').trim()===text){
           el.parentElement.classList.add('medcalc-drug-name-hidden');
         }
       }
-
-      /* Keep the Drug Reference section collapsed when it is explicitly toggled. */
       if(/^(Drugs|Drug Reference|Drug Library)$/i.test(text) && !el.dataset.medcalcDrugFix){
         el.dataset.medcalcDrugFix='1';
         var box=el.parentElement;
@@ -43,8 +38,6 @@
           this.setAttribute('aria-expanded',String(!b.classList.contains('medcalc-drugs-collapsed')));
         });
       }
-
-      /* Promote key clinical references. */
       if(/^(Normal Values|Examination)$/i.test(text) && !el.dataset.medcalcPromote){
         el.dataset.medcalcPromote='1';
         var p=el.parentElement;
@@ -52,12 +45,17 @@
       }
     }
   }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',install);
-  }else{
-    install();
-  }
-
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install); else install();
   new MutationObserver(function(){install();}).observe(document.documentElement,{childList:true,subtree:true});
+
+  /* Load the system-wise disease navigation after the existing sidebar patch. */
+  function loadSystemOrganizer(){
+    if(document.getElementById('medcalc-system-organizer-script')) return;
+    var s=document.createElement('script');
+    s.id='medcalc-system-organizer-script';
+    s.src='disease-system-organizer.js';
+    s.defer=true;
+    document.head.appendChild(s);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',loadSystemOrganizer); else loadSystemOrganizer();
 })();
